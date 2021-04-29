@@ -3,7 +3,7 @@ import './App.css';
 
 function App() {
   return (
-    <div className="App">Time Optimal Youtube PLaylist Generator</div>
+    <div className="App">Time Optimal Youtube Playlist Generator</div>
   );
 }
 
