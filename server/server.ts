@@ -1,6 +1,7 @@
 import express, { json, response } from "express";
 import cors from "cors";
 import { AxiosResponse } from "axios";
+import { YoutubeVideo, UserPreference } from "./@types/youtube";
 
 require("dotenv").config();
 
