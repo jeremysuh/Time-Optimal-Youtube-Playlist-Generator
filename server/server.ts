@@ -1,7 +1,8 @@
 import express, { json, response } from "express";
 import cors from "cors";
 import { AxiosResponse } from "axios";
-import { YoutubeVideo, UserPreference, PlaylistItem, PlaylistItemListResponse } from "./@types/youtube";
+import { YoutubeVideo, UserPreference, PlaylistItem, VideoListResponse, PlaylistItemListResponse, Video } from "./@types/youtube";
+import {parse, end, toSeconds, pattern} from 'iso8601-duration';
 
 require("dotenv").config();
 
@@ -48,7 +49,7 @@ const retrieveVideoIdsFromPlaylist = async (playlistId: string): Promise<string[
     }
 
     const videos: string[] = [];
-    
+
     pageDatas.forEach((data: PlaylistItemListResponse) => {
         const items: PlaylistItem[] = data.items;
 
@@ -62,15 +63,58 @@ const retrieveVideoIdsFromPlaylist = async (playlistId: string): Promise<string[
     return videos;
 };
 
+//CURRENTLY ONLY 50 VIDEOS MAX POSSIBLE; FIX
 const retrieveVideosFromIds = async (videoIds: string[]): Promise<YoutubeVideo[]> => {
     const videos: YoutubeVideo[] = [];
-    videos.push({
-        title: "test",
-        id: "test",
-        channelTitle: "test",
-        channelId: "test",
-        stats: null,
-    });
+
+    const url = "https://youtube.googleapis.com/youtube/v3/videos";
+
+    const pageDatas: VideoListResponse[] = [];
+
+    let begin = 0, chunkSize = 50;
+
+    while (begin < videoIds.length) {
+
+        const videoIdsTemp = videoIds.slice(begin, begin + chunkSize);
+
+        const params = new URLSearchParams();
+        const parts = ["id", "contentDetails", "snippet", "status", "statistics"];
+    
+        parts.forEach((part: string) => params.append("part", part));
+        params.append("key", process.env.YOUTUBE_API_KEY as string);
+
+        videoIdsTemp.forEach((id : string) => params.append("id", id))
+
+        const data : VideoListResponse = await axios.get(url, { params }).then((response: AxiosResponse) => response.data);
+        pageDatas.push(data);
+
+        begin = begin + chunkSize;
+    }
+
+    pageDatas.forEach(data => {
+
+        const items : Video[] = data.items;
+        
+        items.forEach((video : Video) => {
+            videos.push({
+                title: video.snippet.title,
+                id: video.id,
+                channelTitle: video.snippet.channelTitle,
+                channelId: video.snippet.channelId,
+                publishedAt: video.snippet.publishedAt, //value
+                stats: {
+                    duration: toSeconds(parse(video.contentDetails.duration)), //weight
+                    viewCount: video.statistics.viewCount, //value
+                    likeCount: video.statistics.likeCount, //value
+                    dislikeCount: video.statistics.dislikeCount, //value
+                    commentCount: video.statistics.commentCount
+                },
+            });
+        })
+
+    })
+
+
     return videos;
 };
 
@@ -106,8 +150,9 @@ app.get("/playlist", async (req, res) => {
     const playlist = await determineOptiminalPlaylist(videos as YoutubeVideo[], preference);
 
     const videoIdsTemp = await retrieveVideoIdsFromPlaylist(playlistId as string);
+    const videosTemp = await retrieveVideosFromIds(videoIdsTemp)
 
-    res.json(videoIdsTemp);
+    res.json(videosTemp);
 });
 
 app.listen(PORT, () => {
