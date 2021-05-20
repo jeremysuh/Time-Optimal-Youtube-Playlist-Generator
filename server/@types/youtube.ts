@@ -48,6 +48,18 @@ type PlaylistItemListResponse = {
     items: PlaylistItem[];
 };
 
+type VideoListResponse = {
+    kind: "youtube#videoListResponse";
+    etag: string;
+    nextPageToken: string;
+    prevPageToken: string;
+    pageInfo: {
+        totalResults: number;
+        resultsPerPage: number;
+    };
+    items: Video[];
+};
+
 type Video = {
     kind: "youtube#video";
     etag: any;
@@ -263,16 +275,17 @@ type Video = {
 };
 
 type YoutubeVideoStats = {
-    duration: number; //weight
-    publishedAt: Date; //value
+    duration: number; //seconds
     viewCount: number; //value
-    likeCount: number; //value
-    dislikeCount: number; //value
+    likeCount: number;
+    dislikeCount: number;
+    commentCount: number;
 };
 
 type YoutubeVideo = {
     title: string;
     id: string;
+    publishedAt: Date; //value
     channelTitle: string;
     channelId: string;
     stats: YoutubeVideoStats | null;
@@ -283,4 +296,4 @@ type UserPreference = {
     priority: string;
 };
 
-export type { YoutubeVideo, UserPreference, PlaylistItem, PlaylistItemListResponse, Video };
+export type { YoutubeVideo, UserPreference, PlaylistItem, PlaylistItemListResponse, Video, VideoListResponse };
