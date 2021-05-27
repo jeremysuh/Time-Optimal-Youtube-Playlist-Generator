@@ -63,7 +63,6 @@ const retrieveVideoIdsFromPlaylist = async (playlistId: string): Promise<string[
     return videos;
 };
 
-//CURRENTLY ONLY 50 VIDEOS MAX POSSIBLE; FIX
 const retrieveVideosFromIds = async (videoIds: string[]): Promise<YoutubeVideo[]> => {
     const videos: YoutubeVideo[] = [];
 
@@ -125,7 +124,23 @@ const collectAllVideos = async (playlistId: string): Promise<YoutubeVideo[]> => 
 };
 
 const determineOptiminalPlaylist = async (videos: YoutubeVideo[], preference: UserPreference): Promise<YoutubeVideo[] | null> => {
-    return videos;
+    const sortedVideos : YoutubeVideo[] = videos.slice();
+    sortedVideos.sort((a, b) => {
+        return a.stats.duration - b.stats.duration; //sorts by duration
+    })
+
+    const result : YoutubeVideo[] = [];
+
+    let timeAvailable = preference.time;
+    for (let video of sortedVideos) {
+        if (timeAvailable - video.stats.duration >= 0) {
+            result.push(video);
+        }else{
+            break;
+        }
+        timeAvailable -= video.stats.duration
+    }
+    return result;
 };
 
 const PRIORITY = {
@@ -144,15 +159,18 @@ app.get("/playlist", async (req, res) => {
     const playlistId: string | undefined | null = req.query.playlistId as string | undefined | null;
     if (!playlistId || playlistId == null) res.send("No valid playlistId included");
 
-    const preference: UserPreference = { time: 30, priority: PRIORITY.NONE };
+    let time: number | undefined | null = req.query.time as number | undefined | null;
+    if (!time || time == null) time = 30 * 60; //default time of 30 minutes
+    
+    const preference: UserPreference = { time: time, priority: PRIORITY.NONE };
 
     const videos = await collectAllVideos(playlistId as string);
     const playlist = await determineOptiminalPlaylist(videos as YoutubeVideo[], preference);
 
-    const videoIdsTemp = await retrieveVideoIdsFromPlaylist(playlistId as string);
-    const videosTemp = await retrieveVideosFromIds(videoIdsTemp)
+    //const videoIdsTemp = await retrieveVideoIdsFromPlaylist(playlistId as string);
+    //const videosTemp = await retrieveVideosFromIds(videoIdsTemp)
 
-    res.json(videosTemp);
+    res.json(playlist);
 });
 
 app.listen(PORT, () => {
