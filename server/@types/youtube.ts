@@ -288,7 +288,7 @@ type YoutubeVideo = {
     publishedAt: Date; //value
     channelTitle: string;
     channelId: string;
-    stats: YoutubeVideoStats | null;
+    stats: YoutubeVideoStats;
 };
 
 type UserPreference = {
