@@ -159,10 +159,12 @@ app.get("/playlist", async (req, res) => {
     const playlistId: string | undefined | null = req.query.playlistId as string | undefined | null;
     if (!playlistId || playlistId == null) res.send("No valid playlistId included");
 
-    let time: number | undefined | null = req.query.time as number | undefined | null;
-    if (!time || time == null) time = 30 * 60; //default time of 30 minutes
+    let timeInMinutes: number | undefined | null = req.query.time as number | undefined | null;
+    if (!timeInMinutes || timeInMinutes == null) timeInMinutes = 30 * 60; //default time of 30 minutes
     
-    const preference: UserPreference = { time: time, priority: PRIORITY.NONE };
+    const timeInSeconds = timeInMinutes * 60
+
+    const preference: UserPreference = { time: timeInSeconds, priority: PRIORITY.NONE };
 
     const videos = await collectAllVideos(playlistId as string);
     const playlist = await determineOptiminalPlaylist(videos as YoutubeVideo[], preference);
