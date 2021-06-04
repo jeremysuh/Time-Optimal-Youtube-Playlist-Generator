@@ -1,8 +1,8 @@
 import express, { json, response } from "express";
 import cors from "cors";
-import { AxiosResponse } from "axios";
+import { AxiosError, AxiosResponse } from "axios";
 import { YoutubeVideo, UserPreference, PlaylistItem, VideoListResponse, PlaylistItemListResponse, Video } from "./@types/youtube";
-import {parse, end, toSeconds, pattern} from 'iso8601-duration';
+import { parse, end, toSeconds, pattern } from "iso8601-duration";
 
 require("dotenv").config();
 
@@ -70,31 +70,30 @@ const retrieveVideosFromIds = async (videoIds: string[]): Promise<YoutubeVideo[]
 
     const pageDatas: VideoListResponse[] = [];
 
-    let begin = 0, chunkSize = 50;
+    let begin = 0,
+        chunkSize = 50;
 
     while (begin < videoIds.length) {
-
         const videoIdsTemp = videoIds.slice(begin, begin + chunkSize);
 
         const params = new URLSearchParams();
         const parts = ["id", "contentDetails", "snippet", "status", "statistics"];
-    
+
         parts.forEach((part: string) => params.append("part", part));
         params.append("key", process.env.YOUTUBE_API_KEY as string);
 
-        videoIdsTemp.forEach((id : string) => params.append("id", id))
+        videoIdsTemp.forEach((id: string) => params.append("id", id));
 
-        const data : VideoListResponse = await axios.get(url, { params }).then((response: AxiosResponse) => response.data);
+        const data: VideoListResponse = await axios.get(url, { params }).then((response: AxiosResponse) => response.data);
         pageDatas.push(data);
 
         begin = begin + chunkSize;
     }
 
-    pageDatas.forEach(data => {
+    pageDatas.forEach((data) => {
+        const items: Video[] = data.items;
 
-        const items : Video[] = data.items;
-        
-        items.forEach((video : Video) => {
+        items.forEach((video: Video) => {
             videos.push({
                 title: video.snippet.title,
                 id: video.id,

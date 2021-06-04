@@ -9,15 +9,30 @@ function App() {
     const [generatedPlaylist, setGeneratedPlaylist] = useState<any[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
 
-    const determinePlaylistUrlValidity = (playlistUrl: string) => true;
+    const determinePlaylistUrlValidity = (playlistUrl: string) => {
+        return playlistUrl.includes("www.youtube.com") && playlistUrl.includes("list=")
+    };
 
     const generatePlaylist = async (playlistUrl: string, time: number) => {
+
         const isValidPlaylistUrl = determinePlaylistUrlValidity(playlistUrl);
         if (isValidPlaylistUrl === false) return;
+
+        let playlistId = playlistUrl.slice();
+
+        if (playlistId.includes("www.youtube.com")) { //extract playlistId from full youtube url
+            const urlParams = new URLSearchParams(playlistUrl);
+            if (urlParams.get('list') !== null) {
+                playlistId = urlParams.get('list') as string;
+            }else{
+                return;
+            }      
+        }
+
         setLoading(true);
 
         const params = new URLSearchParams();
-        params.append("playlistId", playlistUrl as string);
+        params.append("playlistId", playlistId as string);
         params.append("time", time.toString());
         axios({
             method: "get",
@@ -64,7 +79,7 @@ function App() {
         <div className="App">
             <h1>Time Optimal Youtube Playlist Generator</h1>
             <label>
-                Insert Youtube Playlist <b>Link</b> or <b>ID</b>:{"\t"}
+                Insert Youtube Playlist Link:{"\t"}
             </label>
             <input
                 type="text"
