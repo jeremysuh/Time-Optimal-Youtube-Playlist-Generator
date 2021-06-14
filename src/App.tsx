@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import "./App.scss";
 import { AxiosError, AxiosResponse } from "axios";
-import { GoogleLogin, GoogleLoginResponse, GoogleLoginResponseOffline } from "react-google-login";
 
 const axios = require("axios").default;
 require('dotenv').config()
@@ -67,31 +66,6 @@ function App() {
         </li>
     ));
 
-    const responseGoogle = (response: GoogleLoginResponse | GoogleLoginResponseOffline) => {
-        if (response.hasOwnProperty("accessToken") === false) return;
-
-        const googleResponse = response as GoogleLoginResponse;
-
-        axios({
-            method: "post",
-            url: "http://localhost:3001/playlist",
-            data: {
-                accessToken: googleResponse.accessToken,
-                tokenId: googleResponse.tokenId,
-                googleId: googleResponse.googleId,
-            },
-        })
-            .then((response: AxiosResponse) => {
-                console.log("tuturu");
-                console.log(response);
-            })
-            .catch((error: AxiosError) => {
-                console.log(error);
-            });
-
-        console.log(response);
-    };
-
     let generatedPlaylistTotalDuration = 0;
     generatedPlaylist.forEach((video) => (generatedPlaylistTotalDuration += video.stats.duration / 60));
 
@@ -137,14 +111,6 @@ function App() {
                     <h4>Total Duration: {generatedPlaylistTotalDuration.toFixed(2)} minutes</h4>
                     <a href={generatedPlaylistUntitledUrl} target="_blank" rel="noopener noreferrer">View Playlist on Youtube</a>
                     <br/>
-                    {/* <GoogleLogin
-                        clientId="977086902030-1lcn4r1lmanb6i46sm28cn8vphde3vs0.apps.googleusercontent.com"
-                        buttonText="Add Videos to New Playlist"
-                        onSuccess={responseGoogle}
-                        onFailure={responseGoogle}
-                        cookiePolicy={"single_host_origin"}
-                        scope="https://www.googleapis.com/auth/youtube"
-                    /> */}
                 </div>
             ) : (
                 <br />
