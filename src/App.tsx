@@ -137,14 +137,14 @@ function App() {
                     <h4>Total Duration: {generatedPlaylistTotalDuration.toFixed(2)} minutes</h4>
                     <a href={generatedPlaylistUntitledUrl} target="_blank" rel="noopener noreferrer">View Playlist on Youtube</a>
                     <br/>
-                    <GoogleLogin
+                    {/* <GoogleLogin
                         clientId="977086902030-1lcn4r1lmanb6i46sm28cn8vphde3vs0.apps.googleusercontent.com"
                         buttonText="Add Videos to New Playlist"
                         onSuccess={responseGoogle}
                         onFailure={responseGoogle}
                         cookiePolicy={"single_host_origin"}
                         scope="https://www.googleapis.com/auth/youtube"
-                    />
+                    /> */}
                 </div>
             ) : (
                 <br />
