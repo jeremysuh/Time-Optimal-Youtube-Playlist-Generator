@@ -12,11 +12,11 @@ function App() {
     const [loading, setLoading] = useState<boolean>(false);
 
     const isValidYoutubePlaylistUrl = (url: string) => {
-        return url.includes("www.youtube.com") && url.includes("list=");
+        return (url.includes("www.youtube.com") || url.includes("https://youtube.com") || url.includes("youtube.com")) && url.includes("list=");
     };
 
     const retrievePlaylistIdFromPlaylistUrl = (url: string) => {
-        const urlParams = new URLSearchParams(url);
+        const urlParams = new URL(url).searchParams;
         if (urlParams.get("list") === null) {
             throw new Error("Invalid url");
         }
