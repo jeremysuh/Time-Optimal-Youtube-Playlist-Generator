@@ -46,7 +46,7 @@ function App() {
 
         axios({
             method: "get",
-            url: process.env.NODE_ENV !== "production" ? "https://youtube-playlist-generator.herokuapp.com/playlist" : "http://localhost:3001/playlist",
+            url: process.env.NODE_ENV === "production" ? "https://youtube-playlist-generator.herokuapp.com/playlist" : "http://localhost:3001/playlist",
             params: params,
         })
             .then((response: AxiosResponse) => {
