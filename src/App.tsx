@@ -5,11 +5,19 @@ import { AxiosError, AxiosResponse } from "axios";
 const axios = require("axios").default;
 require("dotenv").config();
 
+const PRIORITY = {
+    VIEWS_MANY: "views_many",
+    VIEWS_FEW: "views_few",
+    DURATION_LONG: "duration_long",
+    DURATION_SHORT: "duration_short",
+};
+
 function App() {
     const [playlistUrl, setPlaylistUrl] = useState<string>("https://www.youtube.com/watch?v=gNi_6U5Pm_o&list=PLDIoUOhQQPlXr63I_vwF9GD8sAKh77dWU");
     const [time, setTime] = useState<number>(30);
     const [generatedPlaylist, setGeneratedPlaylist] = useState<any[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
+    const [priortiy, setPriority] = useState<string>(PRIORITY.VIEWS_MANY);
 
     const isValidYoutubePlaylistUrl = (url: string) => {
         return (url.includes("www.youtube.com") || url.includes("https://youtube.com") || url.includes("youtube.com")) && url.includes("list=");
@@ -34,10 +42,11 @@ function App() {
         const params = new URLSearchParams();
         params.append("playlistId", playlistId as string);
         params.append("time", (time * 60).toString());
+        params.append("priority", priortiy);
 
         axios({
             method: "get",
-            url: process.env.NODE_ENV === "production" ? "https://youtube-playlist-generator.herokuapp.com/playlist" : "http://localhost:3001/playlist",
+            url: process.env.NODE_ENV !== "production" ? "https://youtube-playlist-generator.herokuapp.com/playlist" : "http://localhost:3001/playlist",
             params: params,
         })
             .then((response: AxiosResponse) => {
@@ -50,6 +59,10 @@ function App() {
                 console.log(error);
                 setLoading(false);
             });
+    };
+
+    const onPriorityChange = (value: string) => {
+        setPriority(value);
     };
 
     const generatedPlaylistItems = generatedPlaylist.map((video) => (
@@ -91,12 +104,18 @@ function App() {
             <label>Time Available (minutes):{"\t"}</label>
             <input
                 type="number"
+                pattern="\d*"
                 value={time}
                 onChange={(event) => {
-                    setTime(Number(event.target.value)); //change minutes to seconds
+                    setTime(Math.round(Number(event.target.value))); //change minutes to seconds
                 }}
             ></input>
-            <br />
+            <label>Priority:{"\t"}</label>
+            <select name="priority-selection" id="priority-selection" onChange={(e) => onPriorityChange(e.target.value)}>
+                {Object.entries(PRIORITY).map((entry) => (
+                    <option value={entry[1]} key={entry[0]}>{entry[0]}</option>
+                ))}
+            </select>
             <button disabled={loading} onClick={() => generatePlaylist(playlistUrl, time)}>
                 {loading ? "Loading..." : "Generate Playlist"}
             </button>
