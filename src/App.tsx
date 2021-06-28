@@ -6,8 +6,15 @@ const axios = require("axios").default;
 require("dotenv").config();
 
 const PRIORITY = {
+    RANDOM: "random",
     VIEWS_MANY: "views_many",
     VIEWS_FEW: "views_few",
+    COMMENTS_MANY: "comments_many",
+    COMMENTS_FEW: "comments_few",
+    LIKES: "likes", //will focus on ratio (instead of absolute value)
+    DISLIKES: "dislikes", //will focus on ratio (instead of absolute value)
+    NEW: "new",
+    OLD: "old",
     DURATION_LONG: "duration_long",
     DURATION_SHORT: "duration_short",
 };
@@ -17,7 +24,7 @@ function App() {
     const [time, setTime] = useState<number>(30);
     const [generatedPlaylist, setGeneratedPlaylist] = useState<any[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
-    const [priortiy, setPriority] = useState<string>(PRIORITY.VIEWS_MANY);
+    const [priortiy, setPriority] = useState<string>(PRIORITY.RANDOM);
 
     const isValidYoutubePlaylistUrl = (url: string) => {
         return (url.includes("www.youtube.com") || url.includes("https://youtube.com") || url.includes("youtube.com")) && url.includes("list=");
@@ -113,7 +120,9 @@ function App() {
             <label>Priority:{"\t"}</label>
             <select name="priority-selection" id="priority-selection" onChange={(e) => onPriorityChange(e.target.value)}>
                 {Object.entries(PRIORITY).map((entry) => (
-                    <option value={entry[1]} key={entry[0]}>{entry[0]}</option>
+                    <option value={entry[1]} key={entry[0]}>
+                        {entry[0]}
+                    </option>
                 ))}
             </select>
             <button disabled={loading} onClick={() => generatePlaylist(playlistUrl, time)}>
