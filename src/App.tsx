@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import "./App.scss";
 import { AxiosError, AxiosResponse } from "axios";
+import { useEffect } from "react";
+const { v4: uuidv4 } = require('uuid');
 
 const axios = require("axios").default;
 require("dotenv").config();
@@ -19,12 +21,59 @@ const PRIORITY = {
     DURATION_SHORT: "duration_short",
 };
 
+type PlaylistPanelProps = {
+    playlist: Playlist
+    deletePlaylist: Function
+}
+
+const PlaylistPanel = ({playlist, deletePlaylist} : PlaylistPanelProps) => {
+    
+    let videoIdsText = "";
+    for (const videoId of playlist.videoIds) {
+        videoIdsText += (videoIdsText === "" ? videoId : `,${videoId}`)
+    }
+
+    let generatedPlaylistUntitledUrl = "https://www.youtube.com/watch_videos?video_ids=";
+    for (let i = 0; i < playlist.videoIds.length; ++i) {
+        if (i >= 50) break;
+        const videoId = playlist.videoIds[i];
+        generatedPlaylistUntitledUrl += `${videoId},`;
+    }
+    generatedPlaylistUntitledUrl += "&disable_polymer=true";
+
+    return <div style={{borderStyle: 'solid', margin: '1em'}}>
+            <h4>{playlist.name}</h4>
+            <h4>Videos:</h4>
+            <div>{videoIdsText}</div>
+            <h4>Created on: {playlist.createdOn}</h4>
+            <div>
+            <a href={generatedPlaylistUntitledUrl} target="_blank" rel="noopener noreferrer">
+                        View Playlist on Youtube
+                    </a>
+            </div>
+            <br/>
+            <button onClick={() => deletePlaylist(playlist.id)}>Delete</button>
+        </div>
+}
+
+type Playlist = {
+    id: string;
+    name: string
+    videoIds: string[]
+    createdOn: string
+}
+
 function App() {
     const [playlistUrl, setPlaylistUrl] = useState<string>("https://www.youtube.com/watch?v=gNi_6U5Pm_o&list=PLDIoUOhQQPlXr63I_vwF9GD8sAKh77dWU");
     const [time, setTime] = useState<number>(30);
     const [generatedPlaylist, setGeneratedPlaylist] = useState<any[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
     const [priortiy, setPriority] = useState<string>(PRIORITY.RANDOM);
+    const [savedPlaylists, setSavedPlaylists] = useState<Playlist[]>(localStorage.getItem('saved-playlists') ? JSON.parse(localStorage.getItem('saved-playlists') as string) : []);
+
+    useEffect(() => {
+        localStorage.setItem('saved-playlists', JSON.stringify(savedPlaylists));
+    }, [savedPlaylists])
 
     const isValidYoutubePlaylistUrl = (url: string) => {
         return (url.includes("www.youtube.com") || url.includes("https://youtube.com") || url.includes("youtube.com")) && url.includes("list=");
@@ -53,7 +102,7 @@ function App() {
 
         axios({
             method: "get",
-            url: process.env.NODE_ENV === "production" ? "https://youtube-playlist-generator.herokuapp.com/playlist" : "http://localhost:3001/playlist",
+            url: process.env.NODE_ENV !== "production" ? "https://youtube-playlist-generator.herokuapp.com/playlist" : "http://localhost:3001/playlist",
             params: params,
         })
             .then((response: AxiosResponse) => {
@@ -71,6 +120,25 @@ function App() {
     const onPriorityChange = (value: string) => {
         setPriority(value);
     };
+
+    const savePlaylist = () => {
+        const playlists = savedPlaylists.slice();
+        const videoIds = generatedPlaylist.map((video) => video.id);
+        const uniqueId = uuidv4()
+        playlists.push({
+            id: uniqueId,
+            name: `${uniqueId}`,
+            videoIds: videoIds,
+            createdOn: new Date().toISOString()
+        })
+        setSavedPlaylists(playlists)
+    }
+
+    const deletePlaylist = (id : string) => {
+        let updatedPlaylists = savedPlaylists.slice();
+        updatedPlaylists = updatedPlaylists.filter((playlist) => playlist.id !== id);        
+        setSavedPlaylists(updatedPlaylists)
+    }
 
     const generatedPlaylistItems = generatedPlaylist.map((video) => (
         <li key={video.id}>
@@ -138,10 +206,20 @@ function App() {
                         View Playlist on Youtube
                     </a>
                     <br />
+                    <button onClick={() => savePlaylist()}>Save Playlist</button>
                 </div>
             ) : (
                 <br />
             )}
+            <br/> 
+            <h4>Saved Playlists:</h4>
+            {
+                savedPlaylists.length > 0 
+                ?
+                savedPlaylists.map((playlist) => <PlaylistPanel key={playlist.id} playlist={playlist} deletePlaylist={deletePlaylist}/>)
+                :
+                'No Playlists Saved'
+            }
         </div>
     );
 }
