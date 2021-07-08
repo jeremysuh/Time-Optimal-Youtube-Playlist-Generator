@@ -82,8 +82,8 @@ function App() {
         const authenticate = async () => {
             const url =
                 process.env.NODE_ENV === "production"
-                    ? "https://time-optimal-youtube-playlist-generator.netlify.app/auth/login/success"
-                    : "http://localhost:3001/auth/login/success";
+                    ? "https://time-optimal-youtube-playlist-generator.netlify.app/api/auth/login/success"
+                    : "http://localhost:3001/api/auth/login/success";
             let config = {
                 headers: {
                     "Content-Type": "application/json",
@@ -146,8 +146,8 @@ function App() {
         
         const url =
                 process.env.NODE_ENV === "production"
-                    ? "https://time-optimal-youtube-playlist-generator.netlify.app/playlist"
-                    : "http://localhost:3001/playlist";
+                    ? "https://time-optimal-youtube-playlist-generator.netlify.app/api/playlist"
+                    : "http://localhost:3001/api/playlist";
             let config = {
                 headers: {
                     "Content-Type": "application/json",
@@ -210,14 +210,14 @@ function App() {
 
     const onSignInClick = () => {
         window.open(
-            process.env.NODE_ENV === "production" ? "https://youtube-playlist-generator.herokuapp.com/auth/google" : "http://localhost:3001/auth/google",
+            process.env.NODE_ENV === "production" ? "https://youtube-playlist-generator.herokuapp.com/api/auth/google" : "http://localhost:3001/api/auth/google",
             "_self"
         );
     };
 
     const onSignOutClick = () => {
         window.open(
-            process.env.NODE_ENV === "production" ? "https://youtube-playlist-generator.herokuapp.com/logout" : "http://localhost:3001/logout",
+            process.env.NODE_ENV === "production" ? "https://youtube-playlist-generator.herokuapp.com/api/logout" : "http://localhost:3001/api/logout",
             "_self"
         );
     };
