@@ -3,4 +3,4 @@
   to = "https://youtube-playlist-generator.herokuapp.com/api/:splat"
   status = 200
   force = true
-  Access-Control-Allow-Origin: *
+  headers = { Access-Control-Allow-Origin = “*”}
