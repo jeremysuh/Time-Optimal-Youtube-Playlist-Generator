@@ -199,11 +199,11 @@ function App() {
     ));
 
     const onSignInClick = () => {
-        window.open("http://localhost:3001/auth/google", "_self");
+        window.open(process.env.NODE_ENV === "production" ?  "https://youtube-playlist-generator.herokuapp.com/auth/google": "http://localhost:3001/auth/google", "_self");
     };
 
     const onSignOutClick = () => {
-        window.open("http://localhost:3001/logout", "_self");
+        window.open(process.env.NODE_ENV === "production" ? "https://youtube-playlist-generator.herokuapp.com/logout": "http://localhost:3001/logout", "_self");
     };
 
     let generatedPlaylistTotalDuration = 0;
