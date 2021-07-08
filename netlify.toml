@@ -1,0 +1,5 @@
+[[redirects]]
+  from = "/*"
+  to = "https://youtube-playlist-generator.herokuapp.com/:splat"
+  status = 200
+  force = true

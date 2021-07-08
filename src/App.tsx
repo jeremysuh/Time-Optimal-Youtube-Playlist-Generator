@@ -82,7 +82,7 @@ function App() {
         const authenticate = async () => {
             const url =
                 process.env.NODE_ENV === "production"
-                    ? "https://youtube-playlist-generator.herokuapp.com/auth/login/success"
+                    ? "https://time-optimal-youtube-playlist-generator.netlify.app/auth/login/success"
                     : "http://localhost:3001/auth/login/success";
             let config = {
                 headers: {
@@ -143,9 +143,10 @@ function App() {
         params.append("time", (time * 60).toString());
         params.append("priority", priortiy);
 
+        
         const url =
                 process.env.NODE_ENV === "production"
-                    ? "https://youtube-playlist-generator.herokuapp.com/playlist"
+                    ? "https://time-optimal-youtube-playlist-generator.netlify.app/playlist"
                     : "http://localhost:3001/playlist";
             let config = {
                 headers: {
