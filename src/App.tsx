@@ -210,14 +210,14 @@ function App() {
 
     const onSignInClick = () => {
         window.open(
-            process.env.NODE_ENV === "production" ? "https://youtube-playlist-generator.herokuapp.com/api/auth/google" : "http://localhost:3001/api/auth/google",
+            process.env.NODE_ENV === "production" ? "https://time-optimal-youtube-playlist-generator.netlify.app/api/auth/google" : "http://localhost:3000/api/auth/google",
             "_self"
         );
     };
 
     const onSignOutClick = () => {
         window.open(
-            process.env.NODE_ENV === "production" ? "https://youtube-playlist-generator.herokuapp.com/api/logout" : "http://localhost:3001/api/logout",
+            process.env.NODE_ENV === "production" ? "https://time-optimal-youtube-playlist-generator.netlify.app/api/logout" : "http://localhost:3000/api/logout",
             "_self"
         );
     };
