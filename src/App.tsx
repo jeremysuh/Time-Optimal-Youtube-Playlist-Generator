@@ -143,11 +143,20 @@ function App() {
         params.append("time", (time * 60).toString());
         params.append("priority", priortiy);
 
-        axios({
-            method: "get",
-            url: process.env.NODE_ENV === "production" ? "https://youtube-playlist-generator.herokuapp.com/playlist" : "http://localhost:3001/playlist",
-            params: params,
-        })
+        const url =
+                process.env.NODE_ENV === "production"
+                    ? "https://youtube-playlist-generator.herokuapp.com/playlist"
+                    : "http://localhost:3001/playlist";
+            let config = {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Credentials": true,
+                },
+                params: params,
+                withCredentials: true,
+            };
+
+        axios(url, config)
             .then((response: AxiosResponse) => {
                 const playlist = response.data;
                 setGeneratedPlaylist(playlist);
@@ -199,11 +208,17 @@ function App() {
     ));
 
     const onSignInClick = () => {
-        window.open(process.env.NODE_ENV === "production" ?  "https://youtube-playlist-generator.herokuapp.com/auth/google": "http://localhost:3001/auth/google", "_self");
+        window.open(
+            process.env.NODE_ENV === "production" ? "https://youtube-playlist-generator.herokuapp.com/auth/google" : "http://localhost:3001/auth/google",
+            "_self"
+        );
     };
 
     const onSignOutClick = () => {
-        window.open(process.env.NODE_ENV === "production" ? "https://youtube-playlist-generator.herokuapp.com/logout": "http://localhost:3001/logout", "_self");
+        window.open(
+            process.env.NODE_ENV === "production" ? "https://youtube-playlist-generator.herokuapp.com/logout" : "http://localhost:3001/logout",
+            "_self"
+        );
     };
 
     let generatedPlaylistTotalDuration = 0;
