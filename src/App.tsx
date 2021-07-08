@@ -65,6 +65,10 @@ type Playlist = {
 };
 
 function App() {
+    const [initialLoad, setInitialLoad] = useState<boolean>(false);
+    const [authenticated, setAuthenticated] = useState<boolean>(false);
+    const [user, setUser] = useState<any>(null);
+
     const [playlistUrl, setPlaylistUrl] = useState<string>("https://www.youtube.com/watch?v=gNi_6U5Pm_o&list=PLDIoUOhQQPlXr63I_vwF9GD8sAKh77dWU");
     const [time, setTime] = useState<number>(30);
     const [generatedPlaylist, setGeneratedPlaylist] = useState<any[]>([]);
@@ -73,6 +77,42 @@ function App() {
     const [savedPlaylists, setSavedPlaylists] = useState<Playlist[]>(
         localStorage.getItem("saved-playlists") ? JSON.parse(localStorage.getItem("saved-playlists") as string) : []
     );
+
+    useEffect(() => {
+        const authenticate = async () => {
+            const url =
+                process.env.NODE_ENV === "production"
+                    ? "https://youtube-playlist-generator.herokuapp.com/auth/login/success"
+                    : "http://localhost:3001/auth/login/success";
+            let config = {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Credentials": true,
+                },
+                withCredentials: true,
+            };
+            await axios
+                .get(url, config)
+                .then((response: AxiosResponse) => {
+                    console.log(response.data);
+                    const data = response.data;
+                    if (data.success) {
+                        setAuthenticated(true);
+                        setUser(response.data.user);
+                    } else {
+                        setAuthenticated(false);
+                        setUser(null);
+                    }
+                    setInitialLoad(true);
+                })
+                .catch((error: AxiosError) => {
+                    setAuthenticated(false);
+                    setInitialLoad(true);
+                    console.log(error.message);
+                });
+        };
+        authenticate();
+    }, []);
 
     useEffect(() => {
         localStorage.setItem("saved-playlists", JSON.stringify(savedPlaylists));
@@ -158,6 +198,14 @@ function App() {
         </li>
     ));
 
+    const onSignInClick = () => {
+        window.open("http://localhost:3001/auth/google", "_self");
+    };
+
+    const onSignOutClick = () => {
+        window.open("http://localhost:3001/logout", "_self");
+    };
+
     let generatedPlaylistTotalDuration = 0;
     generatedPlaylist.forEach((video) => (generatedPlaylistTotalDuration += video.stats.duration / 60));
 
@@ -171,6 +219,18 @@ function App() {
 
     return (
         <div className="App">
+            <div style={{ margin: "1em" }}>
+                {authenticated === false ? (
+                    <button onClick={() => onSignInClick()} disabled={!initialLoad}>
+                        Sign in
+                    </button>
+                ) : (
+                    <button onClick={() => onSignOutClick()} disabled={!initialLoad}>
+                        Sign out
+                    </button>
+                )}
+            </div>
+            {user ? <div>{`Hello, ${user.displayName}`}</div> : null}
             <h1>Time Optimal Youtube Playlist Generator</h1>
             <label>Insert Youtube Playlist Link:{"\t"}</label>
             <input
