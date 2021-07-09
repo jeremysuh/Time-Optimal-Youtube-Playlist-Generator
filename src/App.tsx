@@ -92,7 +92,7 @@ function App() {
                 withCredentials: true,
             };
             await axios
-                .get(url, config)
+                .get(url, config, {withCredentials: true})
                 .then((response: AxiosResponse) => {
                     console.log(response.data);
                     const data = response.data;
@@ -157,7 +157,7 @@ function App() {
                 withCredentials: true,
             };
 
-        axios(url, config)
+        axios(url, config,  {withCredentials: true})
             .then((response: AxiosResponse) => {
                 const playlist = response.data;
                 setGeneratedPlaylist(playlist);
