@@ -1,11 +1,10 @@
 [[redirects]]
-  from = "https://time-optimal-youtube-playlist-generator.netlify.app/api/*"
+  from = "/api/*"
   to = "https://youtube-playlist-generator.herokuapp.com/api/:splat"
   status = 200
   force = true
   headers = {Access-Control-Allow-Origin = "*"}
 [[headers]]
-  for = "https://time-optimal-youtube-playlist-generator.netlify.app/api/*"
+  for = "/api/*"
   [headers.values]
   Access-Control-Allow-Origin = "*"
-  
