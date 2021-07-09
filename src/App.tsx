@@ -82,8 +82,8 @@ function App() {
         const authenticate = async () => {
             const url =
                 process.env.NODE_ENV === "production"
-                    ? "https://youtube-playlist-generator.herokuapp.com/api/auth/login/success"
-                    : "http://localhost:3001/api/auth/login/success";
+                    ? "https://youtube-playlist-generator.herokuapp.com/api/auth/login/check"
+                    : "http://localhost:3001/api/auth/login/check";
             let config = {
                 headers: {
                     "Content-Type": "application/json",
