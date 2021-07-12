@@ -77,6 +77,7 @@ function App() {
     const [savedPlaylists, setSavedPlaylists] = useState<Playlist[]>(
         localStorage.getItem("saved-playlists") ? JSON.parse(localStorage.getItem("saved-playlists") as string) : []
     );
+    const [userPlaylists, setUserPlaylists] = useState<Playlist[]>([]);
 
     useEffect(() => {
         const authenticate = async () => {
@@ -92,13 +93,26 @@ function App() {
                 withCredentials: true,
             };
             await axios
-                .get(url, config, {withCredentials: true})
+                .get(url, config, { withCredentials: true })
                 .then((response: AxiosResponse) => {
-                    console.log(response.data);
                     const data = response.data;
+
                     if (data.success) {
                         setAuthenticated(true);
                         setUser(response.data.user);
+
+                        const userPlaylists = response.data.user.playlists;
+                        const temp: Playlist[] = userPlaylists.map((playlist: any) => {
+                            return {
+                                id: playlist.playlistid,
+                                name: playlist.name,
+                                videoTitles: playlist.video_titles,
+                                videoIds: playlist.video_ids,
+                                createdOn: playlist.date_added,
+                            };
+                        });
+                        setUserPlaylists(temp);
+                        console.log(temp);
                     } else {
                         setAuthenticated(false);
                         setUser(null);
@@ -143,21 +157,19 @@ function App() {
         params.append("time", (time * 60).toString());
         params.append("priority", priortiy);
 
-        
         const url =
-                process.env.NODE_ENV === "production"
-                    ? "https://youtube-playlist-generator.herokuapp.com/api/playlist"
-                    : "http://localhost:3001/api/playlist";
-            let config = {
-                headers: {
-                    "Content-Type": "application/json",
-                    "Access-Control-Allow-Credentials": true,
-                },
-                params: params,
-                withCredentials: true,
-            };
+            process.env.NODE_ENV === "production" ? "https://youtube-playlist-generator.herokuapp.com/api/playlist" : "http://localhost:3001/api/playlist";
+        let config = {
+            headers: {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Credentials": true,
+            },
+            params: params,
+            withCredentials: true,
+        };
 
-        axios(url, config,  {withCredentials: true})
+        axios
+            .get(url, config, { withCredentials: true })
             .then((response: AxiosResponse) => {
                 const playlist = response.data;
                 setGeneratedPlaylist(playlist);
@@ -179,20 +191,82 @@ function App() {
         const videoIds = generatedPlaylist.map((video) => video.id);
         const videoTitles = generatedPlaylist.map((video) => video.title);
         const uniqueId = uuidv4();
+        const date = new Date().toISOString();
         playlists.push({
             id: uniqueId,
-            name: `${uniqueId}`,
+            name: `Playlist ${uniqueId}`,
             videoIds: videoIds,
             videoTitles: videoTitles,
-            createdOn: new Date().toISOString(),
+            createdOn: date
         });
         setSavedPlaylists(playlists);
+
+        let updatedUserPlaylists = userPlaylists.slice();
+        updatedUserPlaylists.push({
+            id: uniqueId,
+            name: `Playlist ${uniqueId}`,
+            videoIds: videoIds,
+            videoTitles: videoTitles,
+            createdOn: date
+        });
+        setUserPlaylists(updatedUserPlaylists);
+
+
+        const url =
+            process.env.NODE_ENV === "production"
+                ? "https://youtube-playlist-generator.herokuapp.com/api/savePlaylist"
+                : "http://localhost:3001/api/savePlaylist";
+        let config = {
+            data: {
+                id: uniqueId,
+                name: `Playlist ${uniqueId}`,
+                videoIds: videoIds,
+                videoTitles: videoTitles,
+                createdOn: new Date().toISOString(),
+            },
+            headers: {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Credentials": true,
+            },
+            // params: params,
+            withCredentials: true,
+        };
+
+        if (authenticated) axios
+            .post(url, config, { withCredentials: true })
+            .then(() => console.log("added"))
+            .catch((e: AxiosError) => console.log(e));
     };
 
     const deletePlaylist = (id: string) => {
         let updatedPlaylists = savedPlaylists.slice();
         updatedPlaylists = updatedPlaylists.filter((playlist) => playlist.id !== id);
         setSavedPlaylists(updatedPlaylists);
+
+        let updatedUserPlaylists = userPlaylists.slice();
+        updatedUserPlaylists = updatedUserPlaylists.filter((playlist) => playlist.id !== id);
+        setUserPlaylists(updatedUserPlaylists);
+
+        const url =
+            process.env.NODE_ENV === "production"
+                ? "https://youtube-playlist-generator.herokuapp.com/api/deletePlaylist"
+                : "http://localhost:3001/api/deletePlaylist";
+        let config = {
+            data: {
+                id: id,
+            },
+            headers: {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Credentials": true,
+            },
+            // params: params,
+            withCredentials: true,
+        };
+
+        if (authenticated) axios
+            .post(url, config, { withCredentials: true })
+            .then(() => console.log("added"))
+            .catch((e: AxiosError) => console.log(e));
     };
 
     const generatedPlaylistItems = generatedPlaylist.map((video) => (
@@ -210,7 +284,9 @@ function App() {
 
     const onSignInClick = () => {
         window.open(
-            process.env.NODE_ENV === "production" ? "https://youtube-playlist-generator.herokuapp.com/api/auth/google" : "http://localhost:3001/api/auth/google",
+            process.env.NODE_ENV === "production"
+                ? "https://youtube-playlist-generator.herokuapp.com/api/auth/google"
+                : "http://localhost:3001/api/auth/google",
             "_self"
         );
     };
@@ -293,10 +369,14 @@ function App() {
                 <br />
             )}
             <br />
-            <h4>Saved Playlists:</h4>
-            {savedPlaylists.length > 0
+            <h4>Locally Saved Playlists:</h4>
+            {savedPlaylists.length > 0 && !authenticated
                 ? savedPlaylists.map((playlist) => <PlaylistPanel key={playlist.id} playlist={playlist} deletePlaylist={deletePlaylist} />)
-                : "No Playlists Saved"}
+                : "-"}
+            <h4>User Playlists:</h4>
+            {userPlaylists.length > 0
+                ? userPlaylists.map((playlist) => <PlaylistPanel key={playlist.id} playlist={playlist} deletePlaylist={deletePlaylist} />)
+                : "No User Playlists Saved"}
         </div>
     );
 }
