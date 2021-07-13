@@ -2,10 +2,11 @@ import React, { useState } from "react";
 import "./App.scss";
 import { AxiosError, AxiosResponse } from "axios";
 import { useEffect } from "react";
-const { v4: uuidv4 } = require("uuid");
-
+import { SortableContainer, SortableElement } from "react-sortable-hoc";
+import arrayMove from "array-move";
 const axios = require("axios").default;
 require("dotenv").config();
+const { v4: uuidv4 } = require("uuid");
 
 const PRIORITY = {
     RANDOM: "random",
@@ -55,6 +56,39 @@ const PlaylistPanel = ({ playlist, deletePlaylist }: PlaylistPanelProps) => {
         </div>
     );
 };
+
+interface VideoItemProps {
+    video: any;
+}
+const VideoItem = SortableElement(({ video }: VideoItemProps) => {
+    return (
+        <div style={{ cursor: "pointer", borderStyle: "solid", margin: "4px", padding: "4px" }}>
+            <li key={video.id}>
+                {video.title + "\t"}
+                <b>
+                    {"\t"}Duration: {(video.stats.duration / 60).toFixed(2)} minutes
+                </b>
+                {"\t"}
+                <a href={"https://www.youtube.com/watch?v=" + video.id} target="_blank" rel="noopener noreferrer">
+                    Link
+                </a>
+            </li>
+        </div>
+    );
+});
+
+interface SortablePlaylistProps {
+    playlist: any[];
+}
+const SortabledPlaylist = SortableContainer(({ playlist }: SortablePlaylistProps) => {
+    return (
+        <ul style={{ listStyle: "none" }}>
+            {playlist.map((video, index) => (
+                <VideoItem key={index} index={index} video={video} />
+            ))}
+        </ul>
+    );
+});
 
 type Playlist = {
     id: string;
@@ -197,7 +231,7 @@ function App() {
             name: `Playlist ${uniqueId}`,
             videoIds: videoIds,
             videoTitles: videoTitles,
-            createdOn: date
+            createdOn: date,
         });
         setSavedPlaylists(playlists);
 
@@ -207,10 +241,9 @@ function App() {
             name: `Playlist ${uniqueId}`,
             videoIds: videoIds,
             videoTitles: videoTitles,
-            createdOn: date
+            createdOn: date,
         });
-        setUserPlaylists(updatedUserPlaylists);
-
+        if (authenticated) setUserPlaylists(updatedUserPlaylists);
 
         const url =
             process.env.NODE_ENV === "production"
@@ -232,10 +265,11 @@ function App() {
             withCredentials: true,
         };
 
-        if (authenticated) axios
-            .post(url, config, { withCredentials: true })
-            .then(() => console.log("added"))
-            .catch((e: AxiosError) => console.log(e));
+        if (authenticated)
+            axios
+                .post(url, config, { withCredentials: true })
+                .then(() => console.log("added"))
+                .catch((e: AxiosError) => console.log(e));
     };
 
     const deletePlaylist = (id: string) => {
@@ -245,7 +279,7 @@ function App() {
 
         let updatedUserPlaylists = userPlaylists.slice();
         updatedUserPlaylists = updatedUserPlaylists.filter((playlist) => playlist.id !== id);
-        setUserPlaylists(updatedUserPlaylists);
+        if (authenticated) setUserPlaylists(updatedUserPlaylists);
 
         const url =
             process.env.NODE_ENV === "production"
@@ -263,24 +297,12 @@ function App() {
             withCredentials: true,
         };
 
-        if (authenticated) axios
-            .post(url, config, { withCredentials: true })
-            .then(() => console.log("added"))
-            .catch((e: AxiosError) => console.log(e));
+        if (authenticated)
+            axios
+                .post(url, config, { withCredentials: true })
+                .then(() => console.log("added"))
+                .catch((e: AxiosError) => console.log(e));
     };
-
-    const generatedPlaylistItems = generatedPlaylist.map((video) => (
-        <li key={video.id}>
-            {video.title + "\t"}
-            <b>
-                {"\t"}Duration: {(video.stats.duration / 60).toFixed(2)} minutes
-            </b>
-            {"\t"}
-            <a href={"https://www.youtube.com/watch?v=" + video.id} target="_blank" rel="noopener noreferrer">
-                Link
-            </a>
-        </li>
-    ));
 
     const onSignInClick = () => {
         window.open(
@@ -309,6 +331,10 @@ function App() {
     }
     generatedPlaylistUntitledUrl += "&disable_polymer=true";
 
+    const onSortPlaylistEnd = ({ oldIndex, newIndex }: any) => {
+        const newPlaylist = arrayMove(generatedPlaylist, oldIndex as number, newIndex as number);
+        setGeneratedPlaylist(newPlaylist);
+    };
     return (
         <div className="App">
             <div style={{ margin: "1em" }}>
@@ -357,7 +383,7 @@ function App() {
             {generatedPlaylist.length > 0 ? (
                 <div>
                     <h3>Generated Playlist:</h3>
-                    <ul>{generatedPlaylistItems}</ul>
+                    <SortabledPlaylist playlist={generatedPlaylist} onSortEnd={onSortPlaylistEnd} />
                     <h4>Total Duration: {generatedPlaylistTotalDuration.toFixed(2)} minutes</h4>
                     <a href={generatedPlaylistUntitledUrl} target="_blank" rel="noopener noreferrer">
                         View Playlist on Youtube
