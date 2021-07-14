@@ -2,8 +2,9 @@ import React, { useState } from "react";
 import "./App.scss";
 import { AxiosError, AxiosResponse } from "axios";
 import { useEffect } from "react";
-import { SortableContainer, SortableElement } from "react-sortable-hoc";
 import arrayMove from "array-move";
+import { PlaylistPanel } from "./PlaylistPanel";
+import { SortabledPlaylist } from "./SortablePlaylist";
 const axios = require("axios").default;
 require("dotenv").config();
 const { v4: uuidv4 } = require("uuid");
@@ -22,104 +23,15 @@ const PRIORITY = {
     DURATION_SHORT: "duration_short",
 };
 
-type PlaylistPanelProps = {
-    playlist: Playlist;
-    deletePlaylist: Function;
-    editPlaylist: Function;
-};
-
-const PlaylistPanel = ({ playlist, deletePlaylist, editPlaylist }: PlaylistPanelProps) => {
-    const [playlistName, setPlaylistName] = useState<string>(playlist.name);
-    const [videos, setVideos] = useState<any[]>(() => {
-        const videos = [];
-        for (let i = 0; i < playlist.videoIds.length; ++i) {
-            videos.push({
-                title: playlist.videoTitles[i],
-                id: playlist.videoIds[i],
-            });
-        }
-        return videos;
-    });
-    const [editModeOn, setEditModeOn] = useState<boolean>(false);
-
-    const videoTitlesList = videos.map((video, index) => {
-        return <li key={index}>{video.title}</li>;
-    });
-
-    let generatedPlaylistUntitledUrl = "https://www.youtube.com/watch_videos?video_ids=";
-    for (let i = 0; i < videos.length; ++i) {
-        //if (i >= 50) break; ignore this for now
-        const videoId = videos[i].id;
-        generatedPlaylistUntitledUrl += `${videoId},`;
-    }
-    generatedPlaylistUntitledUrl += "&disable_polymer=true";
-
-    const handleSaveChanges = () => {
-        editPlaylist(playlist.id, playlistName);
-        setVideos(videos); //doesnt do anything for now
-        setEditModeOn(false);
-    };
-
-    return (
-        <div style={{ borderStyle: "solid", margin: "1em", padding: "1em" }}>
-            {editModeOn ? (
-                <input type="text" id="editName" name="editName" defaultValue={playlistName} onChange={(e) => setPlaylistName(e.target.value)} />
-            ) : (
-                <h4>Playlist: {playlistName}</h4>
-            )}
-            <h4>Videos:</h4>
-            <ul>{videoTitlesList}</ul>
-            <h4>Created on: {playlist.createdOn}</h4>
-            <div>
-                <a href={generatedPlaylistUntitledUrl} target="_blank" rel="noopener noreferrer">
-                    View Playlist on Youtube
-                </a>
-            </div>
-            <br />
-            {editModeOn ? <button onClick={() => handleSaveChanges()}>Save</button> : <button onClick={() => setEditModeOn((val) => !val)}>Edit</button>}
-            <button onClick={() => deletePlaylist(playlist.id)}>Delete</button>
-        </div>
-    );
-};
-
-interface VideoItemProps {
-    video: any;
+type Video = {
+    id: string;
+    title: string;
 }
-const VideoItem = SortableElement(({ video }: VideoItemProps) => {
-    return (
-        <div style={{ cursor: "pointer", borderStyle: "solid", margin: "4px", padding: "4px" }}>
-            <li key={video.id}>
-                {video.title + "\t"}
-                <b>
-                    {"\t"}Duration: {(video.stats.duration / 60).toFixed(2)} minutes
-                </b>
-                {"\t"}
-                <a href={"https://www.youtube.com/watch?v=" + video.id} target="_blank" rel="noopener noreferrer">
-                    Link
-                </a>
-            </li>
-        </div>
-    );
-});
-
-interface SortablePlaylistProps {
-    playlist: any[];
-}
-const SortabledPlaylist = SortableContainer(({ playlist }: SortablePlaylistProps) => {
-    return (
-        <ul style={{ listStyle: "none" }}>
-            {playlist.map((video, index) => (
-                <VideoItem key={index} index={index} video={video} />
-            ))}
-        </ul>
-    );
-});
 
 type Playlist = {
     id: string;
     name: string;
-    videoTitles: string[];
-    videoIds: string[];
+    videos: Video[];
     createdOn: string;
 };
 
@@ -130,13 +42,12 @@ function App() {
 
     const [playlistUrl, setPlaylistUrl] = useState<string>("https://www.youtube.com/watch?v=gNi_6U5Pm_o&list=PLDIoUOhQQPlXr63I_vwF9GD8sAKh77dWU");
     const [time, setTime] = useState<number>(30);
+    const [priortiy, setPriority] = useState<string>(PRIORITY.RANDOM);
+
     const [generatedPlaylist, setGeneratedPlaylist] = useState<any[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
-    const [priortiy, setPriority] = useState<string>(PRIORITY.RANDOM);
-    const [savedPlaylists, setSavedPlaylists] = useState<Playlist[]>(
-        localStorage.getItem("saved-playlists") ? JSON.parse(localStorage.getItem("saved-playlists") as string) : []
-    );
-    const [userPlaylists, setUserPlaylists] = useState<Playlist[]>([]);
+
+    const [playlists, setPlaylists] = useState<Playlist[]>([]);
 
     useEffect(() => {
         const authenticate = async () => {
@@ -163,15 +74,14 @@ function App() {
                         const userPlaylists = response.data.user.playlists;
                         const temp: Playlist[] = userPlaylists.map((playlist: any) => {
                             return {
-                                id: playlist.playlistid,
+                                id: playlist.playlist_id,
                                 name: playlist.name,
-                                videoTitles: playlist.video_titles,
-                                videoIds: playlist.video_ids,
+                                videos: playlist.videos,
                                 createdOn: playlist.date_added,
                             };
                         });
-                        setUserPlaylists(temp);
-                        console.log(temp);
+                        console.log(temp)
+                        setPlaylists(temp);
                     } else {
                         setAuthenticated(false);
                         setUser(null);
@@ -186,10 +96,6 @@ function App() {
         };
         authenticate();
     }, []);
-
-    useEffect(() => {
-        localStorage.setItem("saved-playlists", JSON.stringify(savedPlaylists));
-    }, [savedPlaylists]);
 
     const isValidYoutubePlaylistUrl = (url: string) => {
         return (url.includes("www.youtube.com") || url.includes("https://youtube.com") || url.includes("youtube.com")) && url.includes("list=");
@@ -246,29 +152,30 @@ function App() {
     };
 
     const savePlaylist = () => {
-        const playlists = savedPlaylists.slice();
-        const videoIds = generatedPlaylist.map((video) => video.id);
-        const videoTitles = generatedPlaylist.map((video) => video.title);
+        if (!authenticated) return;
+
+        let updatedPlaylists = playlists.slice();
+
+        const videos : any[] = [];
+        generatedPlaylist.forEach((video) => {
+            videos.push({
+                id: video.id, 
+                title: video.title
+            })
+        })
         const uniqueId = uuidv4();
         const date = new Date().toISOString();
-        playlists.push({
-            id: uniqueId,
-            name: `Playlist ${uniqueId}`,
-            videoIds: videoIds,
-            videoTitles: videoTitles,
-            createdOn: date,
-        });
-        setSavedPlaylists(playlists);
 
-        let updatedUserPlaylists = userPlaylists.slice();
-        updatedUserPlaylists.push({
+        const playlistName = updatedPlaylists.length + 1;
+
+        updatedPlaylists.push({
             id: uniqueId,
-            name: `Playlist ${uniqueId}`,
-            videoIds: videoIds,
-            videoTitles: videoTitles,
+            name: `Playlist ${playlistName}`,
+            videos: videos,
             createdOn: date,
         });
-        if (authenticated) setUserPlaylists(updatedUserPlaylists);
+
+        setPlaylists(updatedPlaylists);
 
         const url =
             process.env.NODE_ENV === "production"
@@ -277,9 +184,8 @@ function App() {
         let config = {
             data: {
                 id: uniqueId,
-                name: `Playlist ${uniqueId}`,
-                videoIds: videoIds,
-                videoTitles: videoTitles,
+                name: `Playlist ${playlistName}`,
+                videos: videos,
                 createdOn: new Date().toISOString(),
             },
             headers: {
@@ -298,13 +204,11 @@ function App() {
     };
 
     const deletePlaylist = (id: string) => {
-        let updatedPlaylists = savedPlaylists.slice();
-        updatedPlaylists = updatedPlaylists.filter((playlist) => playlist.id !== id);
-        setSavedPlaylists(updatedPlaylists);
+        if (!authenticated) return;
 
-        let updatedUserPlaylists = userPlaylists.slice();
-        updatedUserPlaylists = updatedUserPlaylists.filter((playlist) => playlist.id !== id);
-        if (authenticated) setUserPlaylists(updatedUserPlaylists);
+        let updatedPlaylists: Playlist[] = playlists.slice();
+        updatedPlaylists = updatedPlaylists.filter((playlist) => playlist.id !== id);
+        setPlaylists(updatedPlaylists);
 
         const url =
             process.env.NODE_ENV === "production"
@@ -318,7 +222,6 @@ function App() {
                 "Content-Type": "application/json",
                 "Access-Control-Allow-Credentials": true,
             },
-            // params: params,
             withCredentials: true,
         };
 
@@ -330,18 +233,13 @@ function App() {
     };
 
     const editPlaylist = (id: string, newName: string) => {
-        let updatedPlaylists: Playlist[] = savedPlaylists.slice();
+        if (!authenticated) return;
+
+        let updatedPlaylists: Playlist[] = playlists.slice();
         const indexToUpdate = updatedPlaylists.findIndex((playlist) => playlist.id === id);
         if (indexToUpdate !== -1) {
             updatedPlaylists[indexToUpdate].name = newName;
-            setSavedPlaylists(updatedPlaylists);
-        }
-
-        let updatedUserPlaylists: Playlist[] = userPlaylists.slice();
-        const indexToUpdate2 = updatedUserPlaylists.findIndex((playlist) => playlist.id === id);
-        if (indexToUpdate2 !== -1) {
-            updatedUserPlaylists[indexToUpdate2].name = newName;
-            if (authenticated) setUserPlaylists(updatedUserPlaylists);
+            setPlaylists(updatedPlaylists);
         }
 
         const url =
@@ -357,7 +255,6 @@ function App() {
                 "Content-Type": "application/json",
                 "Access-Control-Allow-Credentials": true,
             },
-            // params: params,
             withCredentials: true,
         };
 
@@ -440,8 +337,8 @@ function App() {
                     </option>
                 ))}
             </select>
-            <button disabled={loading} onClick={() => generatePlaylist(playlistUrl, time)}>
-                {loading ? "Loading..." : "Generate Playlist"}
+            <button disabled={loading || !authenticated} onClick={() => generatePlaylist(playlistUrl, time)}>
+                {loading || !authenticated ? (!authenticated ? "Sign in to use" : "Loading...") : "Generate Playlist"}
             </button>
             <br />
             {generatedPlaylist.length > 0 ? (
@@ -462,25 +359,12 @@ function App() {
 
             {initialLoad ? (
                 <div>
-                    {authenticated === false ? (
-                        <div>
-                            <h4>Locally Saved Playlists:</h4>
-                            {savedPlaylists.length > 0 && !authenticated
-                                ? savedPlaylists.map((playlist) => (
-                                      <PlaylistPanel key={playlist.id} playlist={playlist} deletePlaylist={deletePlaylist} editPlaylist={editPlaylist} />
-                                  ))
-                                : "-"}
-                        </div>
-                    ) : (
-                        <div>
-                            <h4>User Playlists:</h4>
-                            {userPlaylists.length > 0
-                                ? userPlaylists.map((playlist) => (
-                                      <PlaylistPanel key={playlist.id} playlist={playlist} deletePlaylist={deletePlaylist} editPlaylist={editPlaylist} />
-                                  ))
-                                : "No User Playlists Saved"}
-                        </div>
-                    )}
+                    <h4>Playlists:</h4>
+                    {playlists.length > 0
+                        ? playlists.map((playlist) => (
+                              <PlaylistPanel key={playlist.id} playlist={playlist} deletePlaylist={deletePlaylist} editPlaylist={editPlaylist} />
+                          ))
+                        : "No Playlists Created"}
                 </div>
             ) : null}
         </div>
