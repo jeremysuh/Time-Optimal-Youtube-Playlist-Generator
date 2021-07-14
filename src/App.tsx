@@ -2,9 +2,10 @@ import React, { useState } from "react";
 import "./App.scss";
 import { AxiosError, AxiosResponse } from "axios";
 import { useEffect } from "react";
-import arrayMove from "array-move";
-import { PlaylistPanel } from "./PlaylistPanel";
-import { SortabledPlaylist } from "./SortablePlaylist";
+import { Navbar } from "./Navbar";
+import { InputPanel } from "./InputPanel";
+import { GeneratedPlaylistPanel } from "./GeneratedPlaylistPanel";
+import { UserPlaylists } from "./UserPlaylists";
 const axios = require("axios").default;
 require("dotenv").config();
 const { v4: uuidv4 } = require("uuid");
@@ -26,7 +27,7 @@ const PRIORITY = {
 type Video = {
     id: string;
     title: string;
-}
+};
 
 type Playlist = {
     id: string;
@@ -40,7 +41,9 @@ function App() {
     const [authenticated, setAuthenticated] = useState<boolean>(false);
     const [user, setUser] = useState<any>(null);
 
-    const [playlistUrl, setPlaylistUrl] = useState<string>("https://www.youtube.com/watch?v=gNi_6U5Pm_o&list=PLDIoUOhQQPlXr63I_vwF9GD8sAKh77dWU");
+    const [playlistUrl, setPlaylistUrl] = useState<string>(
+        "https://www.youtube.com/watch?v=gNi_6U5Pm_o&list=PLDIoUOhQQPlXr63I_vwF9GD8sAKh77dWU"
+    );
     const [time, setTime] = useState<number>(30);
     const [priortiy, setPriority] = useState<string>(PRIORITY.RANDOM);
 
@@ -49,6 +52,7 @@ function App() {
 
     const [playlists, setPlaylists] = useState<Playlist[]>([]);
 
+    //Initial Data Load
     useEffect(() => {
         const authenticate = async () => {
             const url =
@@ -80,7 +84,7 @@ function App() {
                                 createdOn: playlist.date_added,
                             };
                         });
-                        console.log(temp)
+                        console.log(temp);
                         setPlaylists(temp);
                     } else {
                         setAuthenticated(false);
@@ -98,7 +102,10 @@ function App() {
     }, []);
 
     const isValidYoutubePlaylistUrl = (url: string) => {
-        return (url.includes("www.youtube.com") || url.includes("https://youtube.com") || url.includes("youtube.com")) && url.includes("list=");
+        return (
+            (url.includes("www.youtube.com") || url.includes("https://youtube.com") || url.includes("youtube.com")) &&
+            url.includes("list=")
+        );
     };
 
     const retrievePlaylistIdFromPlaylistUrl = (url: string) => {
@@ -123,7 +130,9 @@ function App() {
         params.append("priority", priortiy);
 
         const url =
-            process.env.NODE_ENV === "production" ? "https://youtube-playlist-generator.herokuapp.com/api/playlist" : "http://localhost:3001/api/playlist";
+            process.env.NODE_ENV === "production"
+                ? "https://youtube-playlist-generator.herokuapp.com/api/playlist"
+                : "http://localhost:3001/api/playlist";
         let config = {
             headers: {
                 "Content-Type": "application/json",
@@ -156,13 +165,13 @@ function App() {
 
         let updatedPlaylists = playlists.slice();
 
-        const videos : any[] = [];
+        const videos: any[] = [];
         generatedPlaylist.forEach((video) => {
             videos.push({
-                id: video.id, 
-                title: video.title
-            })
-        })
+                id: video.id,
+                title: video.title,
+            });
+        });
         const uniqueId = uuidv4();
         const date = new Date().toISOString();
 
@@ -276,97 +285,38 @@ function App() {
 
     const onSignOutClick = () => {
         window.open(
-            process.env.NODE_ENV === "production" ? "https://youtube-playlist-generator.herokuapp.com/api/logout" : "http://localhost:3001/api/logout",
+            process.env.NODE_ENV === "production"
+                ? "https://youtube-playlist-generator.herokuapp.com/api/logout"
+                : "http://localhost:3001/api/logout",
             "_self"
         );
     };
 
-    let generatedPlaylistTotalDuration = 0;
-    generatedPlaylist.forEach((video) => (generatedPlaylistTotalDuration += video.stats.duration / 60));
-
-    let generatedPlaylistUntitledUrl = "https://www.youtube.com/watch_videos?video_ids=";
-    for (let i = 0; i < generatedPlaylist.length; ++i) {
-        if (i >= 50) break;
-        const video = generatedPlaylist[i];
-        generatedPlaylistUntitledUrl += `${video.id},`;
-    }
-    generatedPlaylistUntitledUrl += "&disable_polymer=true";
-
-    const onSortPlaylistEnd = ({ oldIndex, newIndex }: any) => {
-        const newPlaylist = arrayMove(generatedPlaylist, oldIndex as number, newIndex as number);
-        setGeneratedPlaylist(newPlaylist);
-    };
     return (
         <div className="App">
-            <div style={{ margin: "1em" }}>
-                {authenticated === false ? (
-                    <button onClick={() => onSignInClick()} disabled={!initialLoad}>
-                        Sign in
-                    </button>
-                ) : (
-                    <button onClick={() => onSignOutClick()} disabled={!initialLoad}>
-                        Sign out
-                    </button>
-                )}
-            </div>
+            <Navbar authenticated={authenticated} onSignInClick={onSignInClick} onSignOutClick={onSignOutClick} />
             {user ? <div>{`Hello, ${user.displayName}`}</div> : null}
             <h1>Time Optimal Youtube Playlist Generator</h1>
-            <label>Insert Youtube Playlist Link:{"\t"}</label>
-            <input
-                type="text"
-                value={playlistUrl}
-                onChange={(event) => {
-                    setPlaylistUrl(event.target.value);
-                }}
-            ></input>
-            <br />
-            <label>Time Available (minutes):{"\t"}</label>
-            <input
-                type="number"
-                pattern="\d*"
-                value={time}
-                onChange={(event) => {
-                    setTime(Math.round(Number(event.target.value))); //change minutes to seconds
-                }}
-            ></input>
-            <label>Priority:{"\t"}</label>
-            <select name="priority-selection" id="priority-selection" onChange={(e) => onPriorityChange(e.target.value)}>
-                {Object.entries(PRIORITY).map((entry) => (
-                    <option value={entry[1]} key={entry[0]}>
-                        {entry[0]}
-                    </option>
-                ))}
-            </select>
-            <button disabled={loading || !authenticated} onClick={() => generatePlaylist(playlistUrl, time)}>
-                {loading || !authenticated ? (!authenticated ? "Sign in to use" : "Loading...") : "Generate Playlist"}
-            </button>
-            <br />
-            {generatedPlaylist.length > 0 ? (
-                <div>
-                    <h3>Generated Playlist:</h3>
-                    <SortabledPlaylist playlist={generatedPlaylist} onSortEnd={onSortPlaylistEnd} />
-                    <h4>Total Duration: {generatedPlaylistTotalDuration.toFixed(2)} minutes</h4>
-                    <a href={generatedPlaylistUntitledUrl} target="_blank" rel="noopener noreferrer">
-                        View Playlist on Youtube
-                    </a>
-                    <br />
-                    <button onClick={() => savePlaylist()}>Save Playlist</button>
-                </div>
-            ) : (
-                <br />
-            )}
-            <br />
-
-            {initialLoad ? (
-                <div>
-                    <h4>Playlists:</h4>
-                    {playlists.length > 0
-                        ? playlists.map((playlist) => (
-                              <PlaylistPanel key={playlist.id} playlist={playlist} deletePlaylist={deletePlaylist} editPlaylist={editPlaylist} />
-                          ))
-                        : "No Playlists Created"}
-                </div>
-            ) : null}
+            <InputPanel
+                playlistUrl={playlistUrl}
+                setPlaylistUrl={setPlaylistUrl}
+                time={time}
+                setTime={setTime}
+                onPriorityChange={onPriorityChange}
+                generatePlaylist={generatePlaylist}
+                loading={loading}
+            />
+            <GeneratedPlaylistPanel
+                generatedPlaylist={generatedPlaylist}
+                setGeneratedPlaylist={setGeneratedPlaylist}
+                savePlaylist={savePlaylist}
+            />
+            <UserPlaylists
+                initialLoad={initialLoad}
+                playlists={playlists}
+                deletePlaylist={deletePlaylist}
+                editPlaylist={editPlaylist}
+            />
         </div>
     );
 }

@@ -3,7 +3,7 @@ import React, { useState } from "react";
 type Video = {
     id: string;
     title: string;
-}
+};
 
 type Playlist = {
     id: string;
@@ -53,7 +53,13 @@ const PlaylistPanel = ({ playlist, deletePlaylist, editPlaylist }: PlaylistPanel
     return (
         <div style={{ borderStyle: "solid", margin: "1em", padding: "1em" }}>
             {editModeOn ? (
-                <input type="text" id="editName" name="editName" defaultValue={playlistName} onChange={(e) => setPlaylistName(e.target.value)} />
+                <input
+                    type="text"
+                    id="editName"
+                    name="editName"
+                    defaultValue={playlistName}
+                    onChange={(e) => setPlaylistName(e.target.value)}
+                />
             ) : (
                 <h4>Playlist: {playlistName}</h4>
             )}
@@ -66,10 +72,14 @@ const PlaylistPanel = ({ playlist, deletePlaylist, editPlaylist }: PlaylistPanel
                 </a>
             </div>
             <br />
-            {editModeOn ? <button onClick={() => handleSaveChanges()}>Save</button> : <button onClick={() => setEditModeOn((val) => !val)}>Edit</button>}
+            {editModeOn ? (
+                <button onClick={() => handleSaveChanges()}>Save</button>
+            ) : (
+                <button onClick={() => setEditModeOn((val) => !val)}>Edit</button>
+            )}
             <button onClick={() => deletePlaylist(playlist.id)}>Delete</button>
         </div>
     );
 };
 
-export {PlaylistPanel}
+export { PlaylistPanel };
