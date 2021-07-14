@@ -25,24 +25,48 @@ const PRIORITY = {
 type PlaylistPanelProps = {
     playlist: Playlist;
     deletePlaylist: Function;
+    editPlaylist: Function;
 };
 
-const PlaylistPanel = ({ playlist, deletePlaylist }: PlaylistPanelProps) => {
-    const videoTitlesList = playlist.videoTitles.map((videoTitle, index) => {
-        return <li key={index}>{videoTitle}</li>;
+const PlaylistPanel = ({ playlist, deletePlaylist, editPlaylist }: PlaylistPanelProps) => {
+    const [playlistName, setPlaylistName] = useState<string>(playlist.name);
+    const [videos, setVideos] = useState<any[]>(() => {
+        const videos = [];
+        for (let i = 0; i < playlist.videoIds.length; ++i) {
+            videos.push({
+                title: playlist.videoTitles[i],
+                id: playlist.videoIds[i],
+            });
+        }
+        return videos;
+    });
+    const [editModeOn, setEditModeOn] = useState<boolean>(false);
+
+    const videoTitlesList = videos.map((video, index) => {
+        return <li key={index}>{video.title}</li>;
     });
 
     let generatedPlaylistUntitledUrl = "https://www.youtube.com/watch_videos?video_ids=";
-    for (let i = 0; i < playlist.videoIds.length; ++i) {
-        if (i >= 50) break;
-        const videoId = playlist.videoIds[i];
+    for (let i = 0; i < videos.length; ++i) {
+        //if (i >= 50) break; ignore this for now
+        const videoId = videos[i].id;
         generatedPlaylistUntitledUrl += `${videoId},`;
     }
     generatedPlaylistUntitledUrl += "&disable_polymer=true";
 
+    const handleSaveChanges = () => {
+        editPlaylist(playlist.id, playlistName);
+        setVideos(videos); //doesnt do anything for now
+        setEditModeOn(false);
+    };
+
     return (
         <div style={{ borderStyle: "solid", margin: "1em", padding: "1em" }}>
-            <h4>Playlist: {playlist.name}</h4>
+            {editModeOn ? (
+                <input type="text" id="editName" name="editName" defaultValue={playlistName} onChange={(e) => setPlaylistName(e.target.value)} />
+            ) : (
+                <h4>Playlist: {playlistName}</h4>
+            )}
             <h4>Videos:</h4>
             <ul>{videoTitlesList}</ul>
             <h4>Created on: {playlist.createdOn}</h4>
@@ -52,6 +76,7 @@ const PlaylistPanel = ({ playlist, deletePlaylist }: PlaylistPanelProps) => {
                 </a>
             </div>
             <br />
+            {editModeOn ? <button onClick={() => handleSaveChanges()}>Save</button> : <button onClick={() => setEditModeOn((val) => !val)}>Edit</button>}
             <button onClick={() => deletePlaylist(playlist.id)}>Delete</button>
         </div>
     );
@@ -304,6 +329,45 @@ function App() {
                 .catch((e: AxiosError) => console.log(e));
     };
 
+    const editPlaylist = (id: string, newName: string) => {
+        let updatedPlaylists: Playlist[] = savedPlaylists.slice();
+        const indexToUpdate = updatedPlaylists.findIndex((playlist) => playlist.id === id);
+        if (indexToUpdate !== -1) {
+            updatedPlaylists[indexToUpdate].name = newName;
+            setSavedPlaylists(updatedPlaylists);
+        }
+
+        let updatedUserPlaylists: Playlist[] = userPlaylists.slice();
+        const indexToUpdate2 = updatedUserPlaylists.findIndex((playlist) => playlist.id === id);
+        if (indexToUpdate2 !== -1) {
+            updatedUserPlaylists[indexToUpdate2].name = newName;
+            if (authenticated) setUserPlaylists(updatedUserPlaylists);
+        }
+
+        const url =
+            process.env.NODE_ENV === "production"
+                ? "https://youtube-playlist-generator.herokuapp.com/api/updatePlaylist"
+                : "http://localhost:3001/api/updatePlaylist";
+        let config = {
+            data: {
+                playlistId: id,
+                playlistName: newName,
+            },
+            headers: {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Credentials": true,
+            },
+            // params: params,
+            withCredentials: true,
+        };
+
+        if (authenticated)
+            axios
+                .post(url, config, { withCredentials: true })
+                .then(() => console.log("added"))
+                .catch((e: AxiosError) => console.log(e));
+    };
+
     const onSignInClick = () => {
         window.open(
             process.env.NODE_ENV === "production"
@@ -395,14 +459,30 @@ function App() {
                 <br />
             )}
             <br />
-            <h4>Locally Saved Playlists:</h4>
-            {savedPlaylists.length > 0 && !authenticated
-                ? savedPlaylists.map((playlist) => <PlaylistPanel key={playlist.id} playlist={playlist} deletePlaylist={deletePlaylist} />)
-                : "-"}
-            <h4>User Playlists:</h4>
-            {userPlaylists.length > 0
-                ? userPlaylists.map((playlist) => <PlaylistPanel key={playlist.id} playlist={playlist} deletePlaylist={deletePlaylist} />)
-                : "No User Playlists Saved"}
+
+            {initialLoad ? (
+                <div>
+                    {authenticated === false ? (
+                        <div>
+                            <h4>Locally Saved Playlists:</h4>
+                            {savedPlaylists.length > 0 && !authenticated
+                                ? savedPlaylists.map((playlist) => (
+                                      <PlaylistPanel key={playlist.id} playlist={playlist} deletePlaylist={deletePlaylist} editPlaylist={editPlaylist} />
+                                  ))
+                                : "-"}
+                        </div>
+                    ) : (
+                        <div>
+                            <h4>User Playlists:</h4>
+                            {userPlaylists.length > 0
+                                ? userPlaylists.map((playlist) => (
+                                      <PlaylistPanel key={playlist.id} playlist={playlist} deletePlaylist={deletePlaylist} editPlaylist={editPlaylist} />
+                                  ))
+                                : "No User Playlists Saved"}
+                        </div>
+                    )}
+                </div>
+            ) : null}
         </div>
     );
 }
