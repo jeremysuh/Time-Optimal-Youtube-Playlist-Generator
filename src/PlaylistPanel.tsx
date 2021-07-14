@@ -53,6 +53,7 @@ const PlaylistPanel = ({ playlist, deletePlaylist, editPlaylist }: PlaylistPanel
     return (
         <div style={{ borderStyle: "solid", margin: "1em", padding: "1em" }}>
             {editModeOn ? (
+                <div>
                 <input
                     type="text"
                     id="editName"
@@ -60,9 +61,18 @@ const PlaylistPanel = ({ playlist, deletePlaylist, editPlaylist }: PlaylistPanel
                     defaultValue={playlistName}
                     onChange={(e) => setPlaylistName(e.target.value)}
                 />
+                <br/>
+                </div>
             ) : (
                 <h4>Playlist: {playlistName}</h4>
             )}
+            <div>
+                {editModeOn ? (
+                    <button onClick={() => handleSaveChanges()}>Save</button>
+                ) : (
+                    <button onClick={() => setEditModeOn((val) => !val)}>Edit</button>
+                )}
+            </div>
             <h4>Videos:</h4>
             <ul>{videoTitlesList}</ul>
             <h4>Created on: {playlist.createdOn}</h4>
@@ -72,11 +82,6 @@ const PlaylistPanel = ({ playlist, deletePlaylist, editPlaylist }: PlaylistPanel
                 </a>
             </div>
             <br />
-            {editModeOn ? (
-                <button onClick={() => handleSaveChanges()}>Save</button>
-            ) : (
-                <button onClick={() => setEditModeOn((val) => !val)}>Edit</button>
-            )}
             <button onClick={() => deletePlaylist(playlist.id)}>Delete</button>
         </div>
     );

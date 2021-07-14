@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { SortabledPlaylist } from "./SortablePlaylist";
 import arrayMove from "array-move";
 
@@ -15,6 +15,8 @@ const GeneratedPlaylistPanel = ({
 }: GeneratedPlaylistPanelProps) => {
     let generatedPlaylistTotalDuration = 0;
     generatedPlaylist.forEach((video) => (generatedPlaylistTotalDuration += video.stats.duration / 60));
+
+    const [playlistName, setPlaylistName] = useState<string>("New Playlist");
 
     let generatedPlaylistUntitledUrl = "https://www.youtube.com/watch_videos?video_ids=";
     for (let i = 0; i < generatedPlaylist.length; ++i) {
@@ -38,7 +40,14 @@ const GeneratedPlaylistPanel = ({
                 View Playlist on Youtube
             </a>
             <br />
-            <button onClick={() => savePlaylist()}>Save Playlist</button>
+            <input
+                type="text"
+                id="editName"
+                name="editName"
+                defaultValue={"New Playlist"}
+                onChange={(e) => setPlaylistName(e.target.value)}
+            />
+            <button onClick={() => savePlaylist(playlistName)}>Save Playlist</button>
         </div>
     ) : (
         <br />

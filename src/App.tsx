@@ -160,7 +160,7 @@ function App() {
         setPriority(value);
     };
 
-    const savePlaylist = () => {
+    const savePlaylist = (playlistName : string) => {
         if (!authenticated) return;
 
         let updatedPlaylists = playlists.slice();
@@ -175,11 +175,9 @@ function App() {
         const uniqueId = uuidv4();
         const date = new Date().toISOString();
 
-        const playlistName = updatedPlaylists.length + 1;
-
         updatedPlaylists.push({
             id: uniqueId,
-            name: `Playlist ${playlistName}`,
+            name: `${playlistName}`,
             videos: videos,
             createdOn: date,
         });
@@ -193,7 +191,7 @@ function App() {
         let config = {
             data: {
                 id: uniqueId,
-                name: `Playlist ${playlistName}`,
+                name: `${playlistName}`,
                 videos: videos,
                 createdOn: new Date().toISOString(),
             },
