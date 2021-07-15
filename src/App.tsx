@@ -34,6 +34,7 @@ type Playlist = {
     name: string;
     videos: Video[];
     createdOn: string;
+    updatedOn: string;
 };
 
 function App() {
@@ -76,12 +77,14 @@ function App() {
                         setUser(response.data.user);
 
                         const userPlaylists = response.data.user.playlists;
+                        console.log(userPlaylists)
                         const temp: Playlist[] = userPlaylists.map((playlist: any) => {
                             return {
                                 id: playlist.playlist_id,
                                 name: playlist.name,
                                 videos: playlist.videos,
                                 createdOn: playlist.date_added,
+                                updatedOn: playlist.last_updated
                             };
                         });
                         console.log(temp);
@@ -180,6 +183,7 @@ function App() {
             name: `${playlistName}`,
             videos: videos,
             createdOn: date,
+            updatedOn: date,
         });
 
         setPlaylists(updatedPlaylists);
@@ -193,7 +197,8 @@ function App() {
                 id: uniqueId,
                 name: `${playlistName}`,
                 videos: videos,
-                createdOn: new Date().toISOString(),
+                createdOn: date,
+                updatedOn: date,
             },
             headers: {
                 "Content-Type": "application/json",
@@ -246,6 +251,7 @@ function App() {
         const indexToUpdate = updatedPlaylists.findIndex((playlist) => playlist.id === id);
         if (indexToUpdate !== -1) {
             updatedPlaylists[indexToUpdate].name = newName;
+            updatedPlaylists[indexToUpdate].updatedOn = new Date().toISOString()
             setPlaylists(updatedPlaylists);
         }
 

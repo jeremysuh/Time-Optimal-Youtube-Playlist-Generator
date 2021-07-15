@@ -10,6 +10,7 @@ type Playlist = {
     name: string;
     videos: Video[];
     createdOn: string;
+    updatedOn: string;
 };
 
 type PlaylistPanelProps = {
@@ -87,6 +88,7 @@ const PlaylistPanel = ({ playlist, deletePlaylist, editPlaylist }: PlaylistPanel
                 <ul>{videoTitlesList}</ul>
             </div>
             <h4>Created on: {playlist.createdOn}</h4>
+            <h4>Updated on: {playlist.updatedOn}</h4>
             <div>
                 <a href={generatedPlaylistUntitledUrl} target="_blank" rel="noopener noreferrer">
                     View Playlist on Youtube
