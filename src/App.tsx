@@ -77,14 +77,14 @@ function App() {
                         setUser(response.data.user);
 
                         const userPlaylists = response.data.user.playlists;
-                        console.log(userPlaylists)
+                        console.log(userPlaylists);
                         const temp: Playlist[] = userPlaylists.map((playlist: any) => {
                             return {
                                 id: playlist.playlist_id,
                                 name: playlist.name,
                                 videos: playlist.videos,
                                 createdOn: playlist.date_added,
-                                updatedOn: playlist.last_updated
+                                updatedOn: playlist.last_updated,
                             };
                         });
                         console.log(temp);
@@ -163,7 +163,7 @@ function App() {
         setPriority(value);
     };
 
-    const savePlaylist = (playlistName : string) => {
+    const savePlaylist = (playlistName: string) => {
         if (!authenticated) return;
 
         let updatedPlaylists = playlists.slice();
@@ -244,14 +244,17 @@ function App() {
                 .catch((e: AxiosError) => console.log(e));
     };
 
-    const editPlaylist = (id: string, newName: string) => {
+    const editPlaylist = (id: string, newName: string, videos: Video[]) => {
         if (!authenticated) return;
 
         let updatedPlaylists: Playlist[] = playlists.slice();
+
         const indexToUpdate = updatedPlaylists.findIndex((playlist) => playlist.id === id);
+
         if (indexToUpdate !== -1) {
             updatedPlaylists[indexToUpdate].name = newName;
-            updatedPlaylists[indexToUpdate].updatedOn = new Date().toISOString()
+            updatedPlaylists[indexToUpdate].updatedOn = new Date().toISOString();
+            updatedPlaylists[indexToUpdate].videos = videos; //temp for now
             setPlaylists(updatedPlaylists);
         }
 
@@ -263,6 +266,7 @@ function App() {
             data: {
                 playlistId: id,
                 playlistName: newName,
+                videos: videos,
             },
             headers: {
                 "Content-Type": "application/json",

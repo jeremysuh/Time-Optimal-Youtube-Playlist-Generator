@@ -1,4 +1,63 @@
 import React, { useState } from "react";
+import { SortableContainer, SortableElement } from "react-sortable-hoc";
+import arrayMove from "array-move";
+
+interface SavedVideoItemProps {
+    editModeOn: boolean;
+    video: any;
+    indexInPlaylist: number;
+    deleteVideo: Function;
+    //deleteVideoInGeneratedPlaylist: Function;
+}
+const SavedVideoItem = SortableElement(({ editModeOn, video, indexInPlaylist, deleteVideo }: SavedVideoItemProps) => {
+    return (
+        <li
+            key={indexInPlaylist}
+            style={{
+                margin: "4px",
+                cursor: editModeOn ? "pointer" : "default",
+                borderStyle: editModeOn ? "solid" : "none",
+            }}
+        >
+            <img
+                src={`https://img.youtube.com/vi/${video.id}/default.jpg`}
+                alt="Video_Thumbnail"
+                style={{ maxWidth: "32px", padding: "8px" }}
+            />
+            <span>{video.title}</span>
+            <button
+                style={{ visibility: editModeOn ? "visible" : "hidden" }}
+                onClick={() => deleteVideo(indexInPlaylist)}
+            >
+                Delete
+            </button>
+        </li>
+    );
+});
+
+interface SortabledSavedPlaylistProps {
+    videos: any[];
+    deleteVideo: Function;
+    editModeOn: boolean;
+}
+const SortabledSavedPlaylist = SortableContainer(({ videos, deleteVideo, editModeOn }: SortabledSavedPlaylistProps) => {
+    return (
+        <ul style={{ listStyle: "none", maxHeight: "50vh", overflowY: "scroll", overflowX: "hidden" }}>
+            {videos.map((video, index) => (
+                <SavedVideoItem
+                    key={index}
+                    index={index}
+                    video={video}
+                    deleteVideo={deleteVideo}
+                    editModeOn={editModeOn}
+                    indexInPlaylist={index}
+                    disabled={!editModeOn}
+                    //deleteVideoInGeneratedPlaylist={deleteVideoInGeneratedPlaylist}
+                /> //index not being passed; seems like a bug
+            ))}
+        </ul>
+    );
+});
 
 type Video = {
     id: string;
@@ -33,18 +92,11 @@ const PlaylistPanel = ({ playlist, deletePlaylist, editPlaylist }: PlaylistPanel
     });
     const [editModeOn, setEditModeOn] = useState<boolean>(false);
 
-    const videoTitlesList = videos.map((video, index) => {
-        return (
-            <li key={index}>
-                <img
-                    src={`https://img.youtube.com/vi/${video.id}/default.jpg`}
-                    alt="Video_Thumbnail"
-                    style={{ maxWidth: "32px", padding: "8px" }}
-                />
-                <span>{video.title}</span>
-            </li>
-        );
-    });
+    const deleteVideo = (videoIndex: number) => {
+        let copy = videos.slice();
+        copy = copy.filter((_, index) => videoIndex !== index);
+        setVideos(copy);
+    };
 
     let generatedPlaylistUntitledUrl = "https://www.youtube.com/watch_videos?video_ids=";
     for (let i = 0; i < videos.length; ++i) {
@@ -55,9 +107,14 @@ const PlaylistPanel = ({ playlist, deletePlaylist, editPlaylist }: PlaylistPanel
     generatedPlaylistUntitledUrl += "&disable_polymer=true";
 
     const handleSaveChanges = () => {
-        editPlaylist(playlist.id, playlistName);
+        editPlaylist(playlist.id, playlistName, videos);
         setVideos(videos); //doesnt do anything for now
         setEditModeOn(false);
+    };
+
+    const onSortVideosEnd = ({ oldIndex, newIndex }: any) => {
+        const newVideos = arrayMove(videos, oldIndex as number, newIndex as number);
+        setVideos(newVideos);
     };
 
     return (
@@ -85,7 +142,12 @@ const PlaylistPanel = ({ playlist, deletePlaylist, editPlaylist }: PlaylistPanel
             </div>
             <h4>Videos:</h4>
             <div style={{ maxHeight: "30vh", overflowY: "scroll", overflowX: "hidden", borderStyle: "solid" }}>
-                <ul>{videoTitlesList}</ul>
+                <SortabledSavedPlaylist
+                    videos={videos}
+                    onSortEnd={onSortVideosEnd}
+                    deleteVideo={deleteVideo}
+                    editModeOn={editModeOn}
+                />
             </div>
             <h4>Created on: {playlist.createdOn}</h4>
             <h4>Updated on: {playlist.updatedOn}</h4>
