@@ -78,7 +78,7 @@ const InputPanel = ({
                     </select>
                 </div>
             </div>
-            <button onClick={() => generatePlaylist(playlistUrl, time)} disabled={loading || !authenticated}>
+            <button onClick={() => generatePlaylist(playlistUrl, time)} disabled={loading}>
                 {loading ? "Generating..." : "Generate Playlist"}
             </button>
         </div>

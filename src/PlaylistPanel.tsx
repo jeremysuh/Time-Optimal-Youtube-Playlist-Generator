@@ -42,7 +42,7 @@ interface SortabledSavedPlaylistProps {
 }
 const SortabledSavedPlaylist = SortableContainer(({ videos, deleteVideo, editModeOn }: SortabledSavedPlaylistProps) => {
     return (
-        <ul style={{ listStyle: "none", maxHeight: "50vh", overflowY: "scroll", overflowX: "hidden" }}>
+        <ul style={{ listStyle: "none" }}>
             {videos.map((video, index) => (
                 <SavedVideoItem
                     key={index}

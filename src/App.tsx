@@ -92,6 +92,8 @@ function App() {
                     } else {
                         setAuthenticated(false);
                         setUser(null);
+                        const local_playlists = localStorage.getItem('local_playlists');
+                        if (local_playlists) setPlaylists(JSON.parse(local_playlists));
                     }
                     setInitialLoad(true);
                 })
@@ -164,7 +166,6 @@ function App() {
     };
 
     const savePlaylist = (playlistName: string) => {
-        if (!authenticated) return;
 
         let updatedPlaylists = playlists.slice();
 
@@ -187,6 +188,11 @@ function App() {
         });
 
         setPlaylists(updatedPlaylists);
+
+        if (!authenticated) {
+            localStorage.setItem('local_playlists', JSON.stringify(updatedPlaylists));
+            return;
+        }
 
         const url =
             process.env.NODE_ENV === "production"
@@ -216,11 +222,16 @@ function App() {
     };
 
     const deletePlaylist = (id: string) => {
-        if (!authenticated) return;
 
         let updatedPlaylists: Playlist[] = playlists.slice();
         updatedPlaylists = updatedPlaylists.filter((playlist) => playlist.id !== id);
+
         setPlaylists(updatedPlaylists);
+
+        if (!authenticated) {
+            localStorage.setItem('local_playlists', JSON.stringify(updatedPlaylists));
+            return;
+        }
 
         const url =
             process.env.NODE_ENV === "production"
@@ -245,7 +256,6 @@ function App() {
     };
 
     const editPlaylist = (id: string, newName: string, videos: Video[]) => {
-        if (!authenticated) return;
 
         let updatedPlaylists: Playlist[] = playlists.slice();
 
@@ -256,6 +266,11 @@ function App() {
             updatedPlaylists[indexToUpdate].updatedOn = new Date().toISOString();
             updatedPlaylists[indexToUpdate].videos = videos; //temp for now
             setPlaylists(updatedPlaylists);
+        }
+
+        if (!authenticated) {
+            localStorage.setItem('local_playlists', JSON.stringify(updatedPlaylists));
+            return;
         }
 
         const url =
