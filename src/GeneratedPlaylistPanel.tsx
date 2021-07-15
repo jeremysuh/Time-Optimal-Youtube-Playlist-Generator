@@ -31,10 +31,16 @@ const GeneratedPlaylistPanel = ({
         setGeneratedPlaylist(newPlaylist);
     };
 
+    const deleteVideoInGeneratedPlaylist = (indexInPlaylist: number) => {
+        let updatedPlaylist = generatedPlaylist.slice();
+        updatedPlaylist = updatedPlaylist.filter((_, index) => index !== indexInPlaylist);
+        setGeneratedPlaylist(updatedPlaylist);
+    };
+
     return generatedPlaylist.length > 0 ? (
         <div>
             <h3>Generated Playlist:</h3>
-            <SortabledPlaylist playlist={generatedPlaylist} onSortEnd={onSortPlaylistEnd} />
+            <SortabledPlaylist playlist={generatedPlaylist} onSortEnd={onSortPlaylistEnd} deleteVideoInGeneratedPlaylist={deleteVideoInGeneratedPlaylist} />
             <h4>Total Duration: {generatedPlaylistTotalDuration.toFixed(2)} minutes</h4>
             <a href={generatedPlaylistUntitledUrl} target="_blank" rel="noopener noreferrer">
                 View Playlist on Youtube

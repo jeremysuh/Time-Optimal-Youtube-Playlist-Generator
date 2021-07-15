@@ -303,6 +303,7 @@ function App() {
                 onPriorityChange={onPriorityChange}
                 generatePlaylist={generatePlaylist}
                 loading={loading}
+                authenticated={authenticated}
             />
             <GeneratedPlaylistPanel
                 generatedPlaylist={generatedPlaylist}

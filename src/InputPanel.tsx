@@ -22,6 +22,7 @@ interface InputPanelProps {
     onPriorityChange: Function;
     generatePlaylist: Function;
     loading: boolean;
+    authenticated: boolean
 }
 
 const InputPanel = ({
@@ -32,6 +33,7 @@ const InputPanel = ({
     onPriorityChange,
     generatePlaylist,
     loading,
+    authenticated
 }: InputPanelProps) => {
     return (
         <div>
@@ -76,7 +78,7 @@ const InputPanel = ({
                     </select>
                 </div>
             </div>
-            <button onClick={() => generatePlaylist(playlistUrl, time)} disabled={loading}>
+            <button onClick={() => generatePlaylist(playlistUrl, time)} disabled={loading || !authenticated}>
                 {loading ? "Generating..." : "Generate Playlist"}
             </button>
         </div>
