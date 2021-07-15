@@ -33,7 +33,16 @@ const PlaylistPanel = ({ playlist, deletePlaylist, editPlaylist }: PlaylistPanel
     const [editModeOn, setEditModeOn] = useState<boolean>(false);
 
     const videoTitlesList = videos.map((video, index) => {
-        return <li key={index}>{video.title}</li>;
+        return (
+            <li key={index}>
+                <img
+                    src={`https://img.youtube.com/vi/${video.id}/default.jpg`}
+                    alt="Video_Thumbnail"
+                    style={{ maxWidth: "32px", padding: "8px" }}
+                />
+                <span>{video.title}</span>
+            </li>
+        );
     });
 
     let generatedPlaylistUntitledUrl = "https://www.youtube.com/watch_videos?video_ids=";
@@ -54,14 +63,14 @@ const PlaylistPanel = ({ playlist, deletePlaylist, editPlaylist }: PlaylistPanel
         <div style={{ borderStyle: "solid", margin: "1em", padding: "1em" }}>
             {editModeOn ? (
                 <div>
-                <input
-                    type="text"
-                    id="editName"
-                    name="editName"
-                    defaultValue={playlistName}
-                    onChange={(e) => setPlaylistName(e.target.value)}
-                />
-                <br/>
+                    <input
+                        type="text"
+                        id="editName"
+                        name="editName"
+                        defaultValue={playlistName}
+                        onChange={(e) => setPlaylistName(e.target.value)}
+                    />
+                    <br />
                 </div>
             ) : (
                 <h4>Playlist: {playlistName}</h4>
@@ -74,7 +83,9 @@ const PlaylistPanel = ({ playlist, deletePlaylist, editPlaylist }: PlaylistPanel
                 )}
             </div>
             <h4>Videos:</h4>
-            <ul>{videoTitlesList}</ul>
+            <div style={{ maxHeight: "30vh", overflowY: "scroll", overflowX: "hidden", borderStyle: "solid" }}>
+                <ul>{videoTitlesList}</ul>
+            </div>
             <h4>Created on: {playlist.createdOn}</h4>
             <div>
                 <a href={generatedPlaylistUntitledUrl} target="_blank" rel="noopener noreferrer">
