@@ -1,6 +1,20 @@
 import React, { useState } from "react";
-import { SortableContainer, SortableElement } from "react-sortable-hoc";
-import arrayMove from "array-move";
+import { SortableContainer, SortableElement, SortableHandle } from "react-sortable-hoc";
+import arrayMove from "array-move"; 
+import Typography from "@material-ui/core/Typography"; 
+import TextField from "@material-ui/core/TextField";
+import Grid from "@material-ui/core/Grid";
+import List from "@material-ui/core/List";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemIcon from "@material-ui/core/ListItemIcon";
+import ListItemText from "@material-ui/core/ListItemText";
+import DragHandleIcon from "@material-ui/icons/DragHandle";
+import DeleteIcon from "@material-ui/icons/Delete";
+import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
+import IconButton from "@material-ui/core/IconButton"; 
+import EditIcon from "@material-ui/icons/Edit";
+import SaveIcon from "@material-ui/icons/Save";
+import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 
 interface SavedVideoItemProps {
     editModeOn: boolean;
@@ -9,29 +23,47 @@ interface SavedVideoItemProps {
     deleteVideo: Function;
     //deleteVideoInGeneratedPlaylist: Function;
 }
+
+const DragHandle = SortableHandle(() => (
+    <ListItemIcon>
+        <DragHandleIcon />
+    </ListItemIcon>
+));
+
 const SavedVideoItem = SortableElement(({ editModeOn, video, indexInPlaylist, deleteVideo }: SavedVideoItemProps) => {
     return (
-        <li
+        <div
             key={indexInPlaylist}
             style={{
                 margin: "4px",
                 cursor: editModeOn ? "pointer" : "default",
-                borderStyle: editModeOn ? "solid" : "none",
+                listStyle: "none",
+                listStyleType: "none",
             }}
         >
-            <img
-                src={`https://img.youtube.com/vi/${video.id}/default.jpg`}
-                alt="Video_Thumbnail"
-                style={{ maxWidth: "32px", padding: "8px" }}
-            />
-            <span>{video.title}</span>
-            <button
-                style={{ visibility: editModeOn ? "visible" : "hidden" }}
-                onClick={() => deleteVideo(indexInPlaylist)}
-            >
-                Delete
-            </button>
-        </li>
+            <ListItem alignItems="flex-start" divider>
+                {editModeOn ? <DragHandle /> : null}
+                <img
+                    src={`https://img.youtube.com/vi/${video.id}/default.jpg`}
+                    alt="Video_Thumbnail"
+                    style={{ maxWidth: "32px", padding: "8px" }}
+                />
+                <ListItemText primary={video.title}></ListItemText>
+                <ListItemSecondaryAction>
+                    <IconButton
+                        edge="end"
+                        aria-label="delete"
+                        style={{ visibility: editModeOn ? "visible" : "hidden" }}
+                        onClick={() => {
+                            console.log(video);
+                            deleteVideo(indexInPlaylist);
+                        }}
+                    >
+                        <DeleteIcon />
+                    </IconButton>
+                </ListItemSecondaryAction>
+            </ListItem>
+        </div>
     );
 });
 
@@ -42,20 +74,22 @@ interface SortabledSavedPlaylistProps {
 }
 const SortabledSavedPlaylist = SortableContainer(({ videos, deleteVideo, editModeOn }: SortabledSavedPlaylistProps) => {
     return (
-        <ul style={{ listStyle: "none" }}>
-            {videos.map((video, index) => (
-                <SavedVideoItem
-                    key={index}
-                    index={index}
-                    video={video}
-                    deleteVideo={deleteVideo}
-                    editModeOn={editModeOn}
-                    indexInPlaylist={index}
-                    disabled={!editModeOn}
-                    //deleteVideoInGeneratedPlaylist={deleteVideoInGeneratedPlaylist}
-                /> //index not being passed; seems like a bug
-            ))}
-        </ul>
+        <div>
+            <List style={{ listStyle: "none" }}>
+                {videos.map((video, index) => (
+                    <SavedVideoItem
+                        key={index}
+                        index={index}
+                        video={video}
+                        deleteVideo={deleteVideo}
+                        editModeOn={editModeOn}
+                        indexInPlaylist={index}
+                        disabled={!editModeOn}
+                        //deleteVideoInGeneratedPlaylist={deleteVideoInGeneratedPlaylist}
+                    /> //index not being passed; seems like a bug
+                ))}
+            </List>
+        </div>
     );
 });
 
@@ -118,48 +152,92 @@ const PlaylistPanel = ({ playlist, deletePlaylist, editPlaylist }: PlaylistPanel
     };
 
     return (
-        <div style={{ borderStyle: "solid", margin: "1em", padding: "1em" }}>
-            {editModeOn ? (
-                <div>
-                    <input
-                        type="text"
-                        id="editName"
-                        name="editName"
-                        defaultValue={playlistName}
-                        onChange={(e) => setPlaylistName(e.target.value)}
-                    />
-                    <br />
-                </div>
-            ) : (
-                <h4>Playlist: {playlistName}</h4>
-            )}
-            <div>
+        <div style={{ width: "100%" }}>
+            <Grid container justifyContent="center" spacing={2}>
                 {editModeOn ? (
-                    <button onClick={() => handleSaveChanges()}>Save</button>
+                    <Grid key={0} item>
+                        <TextField
+                            id="editName"
+                            label="New Playlist Name"
+                            variant="outlined"
+                            name="editName"
+                            defaultValue={playlistName}
+                            onChange={(e) => setPlaylistName(e.target.value)}
+                        />
+                        <br />
+                    </Grid>
                 ) : (
-                    <button onClick={() => setEditModeOn((val) => !val)}>Edit</button>
+                    <Grid key={1} item>
+                        <Typography variant="h6" color="secondary">
+                            {playlistName}
+                        </Typography>
+                    </Grid>
                 )}
-            </div>
-            <h4>Videos:</h4>
-            <div style={{ maxHeight: "30vh", overflowY: "scroll", overflowX: "hidden", borderStyle: "solid" }}>
+                <div>
+                    {editModeOn ? (
+                        <Grid key={1} item>
+                            <IconButton onClick={() => handleSaveChanges()}>
+                                <SaveIcon />
+                            </IconButton>
+                        </Grid>
+                    ) : (
+                        <Grid key={1} item>
+                            <IconButton onClick={() => setEditModeOn((val) => !val)}>
+                                <EditIcon />
+                            </IconButton>
+                        </Grid>
+                    )}
+                </div>
+            </Grid>
+            
+
+            <div style={{ maxHeight: "30vh", overflowY: "scroll", overflowX: "hidden" }}>
                 <SortabledSavedPlaylist
                     videos={videos}
                     onSortEnd={onSortVideosEnd}
                     deleteVideo={deleteVideo}
                     editModeOn={editModeOn}
+                    useDragHandle
                 />
             </div>
-            <h4>Created on: {playlist.createdOn}</h4>
-            <h4>Updated on: {playlist.updatedOn}</h4>
-            <div>
-                <a href={generatedPlaylistUntitledUrl} target="_blank" rel="noopener noreferrer">
-                    View Playlist on Youtube
-                </a>
-            </div>
             <br />
-            <button onClick={() => deletePlaylist(playlist.id)}>Delete</button>
+            <Grid container justifyContent="flex-start" spacing={2} direction="row">
+                <Grid item key={0}>
+                    <Typography variant="subtitle2">Created: </Typography>
+                    <Typography variant="body2">{new Date(playlist.createdOn).toUTCString()}</Typography>
+                </Grid>
+                <Grid item key={1}>
+                    <Typography variant="subtitle2">Last Updated: </Typography>
+                    <Typography variant="body2">{new Date(playlist.updatedOn).toUTCString()}</Typography>
+                </Grid>
+            </Grid>
+            <Grid container justifyContent="flex-end" spacing={1} direction="row">
+                <Grid item key={0}>
+                    <IconButton
+                        edge="end"
+                        aria-label="link"
+                        href={generatedPlaylistUntitledUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        <PlayArrowIcon />
+                    </IconButton>
+                </Grid>
+                <Grid item key={0}>
+                    <IconButton
+                        edge="end"
+                        aria-label="delete"
+                        onClick={() => deletePlaylist(playlist.id)}
+                    >
+                        <DeleteIcon />
+                    </IconButton>
+                </Grid>
+            </Grid>
         </div>
     );
 };
+
+
+
 
 export { PlaylistPanel };
