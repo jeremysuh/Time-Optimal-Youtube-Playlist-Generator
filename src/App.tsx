@@ -6,6 +6,8 @@ import { Navbar } from "./Navbar";
 import { InputPanel } from "./InputPanel";
 import { GeneratedPlaylistPanel } from "./GeneratedPlaylistPanel";
 import { UserPlaylists } from "./UserPlaylists";
+import Typography from "@material-ui/core/Typography";
+
 const axios = require("axios").default;
 require("dotenv").config();
 const { v4: uuidv4 } = require("uuid");
@@ -92,7 +94,7 @@ function App() {
                     } else {
                         setAuthenticated(false);
                         setUser(null);
-                        const local_playlists = localStorage.getItem('local_playlists');
+                        const local_playlists = localStorage.getItem("local_playlists");
                         if (local_playlists) setPlaylists(JSON.parse(local_playlists));
                     }
                     setInitialLoad(true);
@@ -166,7 +168,6 @@ function App() {
     };
 
     const savePlaylist = (playlistName: string) => {
-
         let updatedPlaylists = playlists.slice();
 
         const videos: any[] = [];
@@ -190,7 +191,7 @@ function App() {
         setPlaylists(updatedPlaylists);
 
         if (!authenticated) {
-            localStorage.setItem('local_playlists', JSON.stringify(updatedPlaylists));
+            localStorage.setItem("local_playlists", JSON.stringify(updatedPlaylists));
             return;
         }
 
@@ -222,14 +223,13 @@ function App() {
     };
 
     const deletePlaylist = (id: string) => {
-
         let updatedPlaylists: Playlist[] = playlists.slice();
         updatedPlaylists = updatedPlaylists.filter((playlist) => playlist.id !== id);
 
         setPlaylists(updatedPlaylists);
 
         if (!authenticated) {
-            localStorage.setItem('local_playlists', JSON.stringify(updatedPlaylists));
+            localStorage.setItem("local_playlists", JSON.stringify(updatedPlaylists));
             return;
         }
 
@@ -256,7 +256,6 @@ function App() {
     };
 
     const editPlaylist = (id: string, newName: string, videos: Video[]) => {
-
         let updatedPlaylists: Playlist[] = playlists.slice();
 
         const indexToUpdate = updatedPlaylists.findIndex((playlist) => playlist.id === id);
@@ -269,7 +268,7 @@ function App() {
         }
 
         if (!authenticated) {
-            localStorage.setItem('local_playlists', JSON.stringify(updatedPlaylists));
+            localStorage.setItem("local_playlists", JSON.stringify(updatedPlaylists));
             return;
         }
 
@@ -316,31 +315,38 @@ function App() {
     };
 
     return (
-        <div className="App">
-            <Navbar authenticated={authenticated} onSignInClick={onSignInClick} onSignOutClick={onSignOutClick} />
-            {user ? <div>{`Hello, ${user.displayName}`}</div> : null}
-            <h1>Time Optimal Youtube Playlist Generator</h1>
-            <InputPanel
-                playlistUrl={playlistUrl}
-                setPlaylistUrl={setPlaylistUrl}
-                time={time}
-                setTime={setTime}
-                onPriorityChange={onPriorityChange}
-                generatePlaylist={generatePlaylist}
-                loading={loading}
+        <div>
+            <Navbar
                 authenticated={authenticated}
+                onSignInClick={onSignInClick}
+                onSignOutClick={onSignOutClick}
+                displayName={user ? user.displayName : ""}
             />
-            <GeneratedPlaylistPanel
-                generatedPlaylist={generatedPlaylist}
-                setGeneratedPlaylist={setGeneratedPlaylist}
-                savePlaylist={savePlaylist}
-            />
-            <UserPlaylists
-                initialLoad={initialLoad}
-                playlists={playlists}
-                deletePlaylist={deletePlaylist}
-                editPlaylist={editPlaylist}
-            />
+            <br/><br/>
+            <div className="App">
+                <Typography variant="h3">Youtube Playlist Generator</Typography>
+                <InputPanel
+                    playlistUrl={playlistUrl}
+                    setPlaylistUrl={setPlaylistUrl}
+                    time={time}
+                    setTime={setTime}
+                    onPriorityChange={onPriorityChange}
+                    generatePlaylist={generatePlaylist}
+                    loading={loading}
+                    authenticated={authenticated}
+                />
+                <GeneratedPlaylistPanel
+                    generatedPlaylist={generatedPlaylist}
+                    setGeneratedPlaylist={setGeneratedPlaylist}
+                    savePlaylist={savePlaylist}
+                />
+                <UserPlaylists
+                    initialLoad={initialLoad}
+                    playlists={playlists}
+                    deletePlaylist={deletePlaylist}
+                    editPlaylist={editPlaylist}
+                />
+            </div>
         </div>
     );
 }
