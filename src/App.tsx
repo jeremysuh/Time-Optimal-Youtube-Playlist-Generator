@@ -6,8 +6,7 @@ import { Navbar } from "./Navbar";
 import { InputPanel } from "./InputPanel";
 import { GeneratedPlaylistPanel } from "./GeneratedPlaylistPanel";
 import { UserPlaylists } from "./UserPlaylists";
-import Typography from "@material-ui/core/Typography";
-
+ 
 const axios = require("axios").default;
 require("dotenv").config();
 const { v4: uuidv4 } = require("uuid");
@@ -324,7 +323,6 @@ function App() {
             />
             <br/><br/>
             <div className="App">
-                <Typography variant="h3">Youtube Playlist Generator</Typography>
                 <InputPanel
                     playlistUrl={playlistUrl}
                     setPlaylistUrl={setPlaylistUrl}
