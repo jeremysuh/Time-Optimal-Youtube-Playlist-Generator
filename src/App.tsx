@@ -321,7 +321,7 @@ function App() {
                 onSignOutClick={onSignOutClick}
                 displayName={user ? user.displayName : ""}
             />
-            <br/><br/>
+            <br/>
             <div className="App">
                 <InputPanel
                     playlistUrl={playlistUrl}

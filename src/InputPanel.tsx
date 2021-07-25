@@ -8,7 +8,7 @@ import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
-
+import YouTubeIcon from "@material-ui/icons/YouTube";
 const PRIORITY = {
     RANDOM: "random",
     VIEWS_MANY: "views_many",
@@ -57,7 +57,7 @@ const InputPanel = ({
                 flexDirection: "column",
                 justifyContent: "center",
                 alignItems: "center",
-                margin: "8px"
+                margin: "8px",
             }}
             elevation={2}
         >
@@ -69,6 +69,7 @@ const InputPanel = ({
                     alignItems: "center",
                 }}
             >
+                <YouTubeIcon style={{ color: "red" }} fontSize="large" />
                 <Typography variant="h3" style={{ marginBottom: "16px" }}>
                     Youtube Playlist Generator
                 </Typography>
