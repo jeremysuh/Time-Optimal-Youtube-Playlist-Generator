@@ -8,7 +8,8 @@ import Typography from "@material-ui/core/Typography";
 import Link from "@material-ui/core/Link";
 import TextField from "@material-ui/core/TextField";
 import Grid from "@material-ui/core/Grid";
- 
+import CancelIcon from "@material-ui/icons/Cancel";
+import IconButton from "@material-ui/core/IconButton";
 interface GeneratedPlaylistPanelProps {
     generatedPlaylist: any[];
     setGeneratedPlaylist: Function;
@@ -47,7 +48,16 @@ const GeneratedPlaylistPanel = ({
     return generatedPlaylist.length > 0 ? (
         <Card elevation={3} style={{ minWidth: "60vw", margin: "1em" }}>
             <CardContent>
+            <Grid container justifyContent="space-between" spacing={1} alignItems="center">
+            <Grid key={0} item>
                 <Typography variant="h5">Generated Playlist</Typography>
+                </Grid>
+                <Grid key={0} item>
+                <IconButton edge="end" aria-label="clear" onClick={() => setGeneratedPlaylist([])}>
+                    <CancelIcon color="secondary"/>
+                </IconButton>
+                </Grid>
+                </Grid>
                 <SortabledPlaylist
                     playlist={generatedPlaylist}
                     onSortEnd={onSortPlaylistEnd}
@@ -74,22 +84,26 @@ const GeneratedPlaylistPanel = ({
                         </Grid>
                     </Grid>
                     <Grid key={1} item>
-                    <Grid container justifyContent="space-between" spacing={1} alignItems="center">
-                        <Grid key={0} item>
-                            <TextField
-                                id="playlist-name-text-field"
-                                variant="outlined"
-                                name="editName"
-                                defaultValue={"New Playlist"}
-                                onChange={(e) => setPlaylistName(e.target.value)}
-                            />
+                        <Grid container justifyContent="space-between" spacing={1} alignItems="center">
+                            <Grid key={0} item>
+                                <TextField
+                                    id="playlist-name-text-field"
+                                    variant="outlined"
+                                    name="editName"
+                                    defaultValue={"New Playlist"}
+                                    onChange={(e) => setPlaylistName(e.target.value)}
+                                />
+                            </Grid>
+                            <Grid key={1} item>
+                                <Button
+                                    variant="contained"
+                                    color="secondary"
+                                    onClick={() => savePlaylist(playlistName)}
+                                >
+                                    Save Playlist
+                                </Button>
+                            </Grid>
                         </Grid>
-                        <Grid key={1} item>
-                            <Button variant="contained" color="secondary" onClick={() => savePlaylist(playlistName)}>
-                                Save Playlist
-                            </Button>
-                        </Grid>
-                    </Grid>
                     </Grid>
                 </Grid>
             </CardContent>
