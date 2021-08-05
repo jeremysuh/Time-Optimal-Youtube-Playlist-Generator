@@ -51,15 +51,6 @@ const theme = createTheme({
     },
 });
 
-const Background = () => {
-    return (
-        <div
-            className="pattern-background"
-            style={{ position: "absolute", minHeight: "100vh", minWidth: "100vw", zIndex: -2 }}
-        />
-    );
-};
-
 function App() {
     const [initialLoad, setInitialLoad] = useState<boolean>(false);
     const [authenticated, setAuthenticated] = useState<boolean>(false);
@@ -338,7 +329,6 @@ function App() {
     return (
         <div>
             <ThemeProvider theme={theme}>
-                <Background />
                 <Navbar
                     authenticated={authenticated}
                     onSignInClick={onSignInClick}
