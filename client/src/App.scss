@@ -6,9 +6,17 @@
 }
 
 body {
-    background-color: #fafafa
+    background-color: #fafafa;
 }
 
 ul {
     list-style-type: none !important;
-  }
+}
+
+.pattern-background {
+    background-color: #f7f7f7;
+opacity: 0.9;
+background-image:  radial-gradient(#dcdcdc 1.75px, transparent 1.75px), radial-gradient(#dcdcdc 1.75px, #f7f7f7 1.75px);
+background-size: 70px 70px;
+background-position: 0 0,35px 35px;
+}

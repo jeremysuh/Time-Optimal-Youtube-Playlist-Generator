@@ -6,7 +6,9 @@ import { Navbar } from "./Navbar";
 import { InputPanel } from "./InputPanel";
 import { GeneratedPlaylistPanel } from "./GeneratedPlaylistPanel";
 import { UserPlaylists } from "./UserPlaylists";
- 
+import { createTheme } from "@material-ui/core/styles";
+import { ThemeProvider } from "@material-ui/core";
+
 const axios = require("axios").default;
 require("dotenv").config();
 const { v4: uuidv4 } = require("uuid");
@@ -36,6 +38,26 @@ type Playlist = {
     videos: Video[];
     createdOn: string;
     updatedOn: string;
+};
+
+const theme = createTheme({
+    palette: {
+        primary: {
+            main: "#e53935",
+        },
+        secondary: {
+            main: `#5c6bc0`,
+        },
+    },
+});
+
+const Background = () => {
+    return (
+        <div
+            className="pattern-background"
+            style={{ position: "absolute", minHeight: "100vh", minWidth: "100vw", zIndex: -2 }}
+        />
+    );
 };
 
 function App() {
@@ -315,36 +337,39 @@ function App() {
 
     return (
         <div>
-            <Navbar
-                authenticated={authenticated}
-                onSignInClick={onSignInClick}
-                onSignOutClick={onSignOutClick}
-                displayName={user ? user.displayName : ""}
-            />
-            <br/>
-            <div className="App">
-                <InputPanel
-                    playlistUrl={playlistUrl}
-                    setPlaylistUrl={setPlaylistUrl}
-                    time={time}
-                    setTime={setTime}
-                    onPriorityChange={onPriorityChange}
-                    generatePlaylist={generatePlaylist}
-                    loading={loading}
+            <ThemeProvider theme={theme}>
+                <Background />
+                <Navbar
                     authenticated={authenticated}
+                    onSignInClick={onSignInClick}
+                    onSignOutClick={onSignOutClick}
+                    displayName={user ? user.displayName : ""}
                 />
-                <GeneratedPlaylistPanel
-                    generatedPlaylist={generatedPlaylist}
-                    setGeneratedPlaylist={setGeneratedPlaylist}
-                    savePlaylist={savePlaylist}
-                />
-                <UserPlaylists
-                    initialLoad={initialLoad}
-                    playlists={playlists}
-                    deletePlaylist={deletePlaylist}
-                    editPlaylist={editPlaylist}
-                />
-            </div>
+                <br />
+                <div className="App">
+                    <InputPanel
+                        playlistUrl={playlistUrl}
+                        setPlaylistUrl={setPlaylistUrl}
+                        time={time}
+                        setTime={setTime}
+                        onPriorityChange={onPriorityChange}
+                        generatePlaylist={generatePlaylist}
+                        loading={loading}
+                        authenticated={authenticated}
+                    />
+                    <GeneratedPlaylistPanel
+                        generatedPlaylist={generatedPlaylist}
+                        setGeneratedPlaylist={setGeneratedPlaylist}
+                        savePlaylist={savePlaylist}
+                    />
+                    <UserPlaylists
+                        initialLoad={initialLoad}
+                        playlists={playlists}
+                        deletePlaylist={deletePlaylist}
+                        editPlaylist={editPlaylist}
+                    />
+                </div>
+            </ThemeProvider>
         </div>
     );
 }
