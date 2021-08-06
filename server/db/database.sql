@@ -17,4 +17,4 @@ CREATE TABLE playlists (
         video_titles text[] NOT NULL,
         date_added TIMESTAMP NOT NULL,
         last_updated TIMESTAMP NOT NULL
-      );
+);

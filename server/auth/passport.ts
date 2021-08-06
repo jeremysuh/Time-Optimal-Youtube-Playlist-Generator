@@ -2,7 +2,7 @@ const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 require("dotenv").config();
 import axios, { AxiosError } from "axios";
-import pool from "./db";
+import pool from "../db/db";
 
 // serialize the user.id to save in the cookie session
 // so the browser will remember the user when login
