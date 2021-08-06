@@ -1,4 +1,4 @@
-import { YoutubeVideo } from "./@types/youtube";
+import { YoutubeVideo } from "../@types/youtube";
 
 export type KnapsackResponse = {
     weight: number;
@@ -48,7 +48,12 @@ export const knapsack = (W: number, wt: number[], val: number[], n: number): Kna
 };
 
 //wt = time; value = percentile
-export const youtubeVideosKnapsack = (W: number, wt: YoutubeVideo[], val: number[], n: number): YoutubeKnapsackResponse[] => {
+export const youtubeVideosKnapsack = (
+    W: number,
+    wt: YoutubeVideo[],
+    val: number[],
+    n: number
+): YoutubeKnapsackResponse[] => {
     let results: YoutubeKnapsackResponse[] = [];
 
     let i: number, w: number;
@@ -64,10 +69,10 @@ export const youtubeVideosKnapsack = (W: number, wt: YoutubeVideo[], val: number
         for (w = 0; w <= W; w++) {
             if (i == 0 || w == 0) K[i][w] = 0;
             else if (wt[i - 1].stats.duration <= w) {
-                K[i][w] = Math.max(val[i - 1] + K[i - 1][w - wt[i - 1].stats.duration], K[i - 1][w])
-            }else { 
-                K[i][w] = K[i - 1][w]
-            };
+                K[i][w] = Math.max(val[i - 1] + K[i - 1][w - wt[i - 1].stats.duration], K[i - 1][w]);
+            } else {
+                K[i][w] = K[i - 1][w];
+            }
         }
     }
 
@@ -78,11 +83,12 @@ export const youtubeVideosKnapsack = (W: number, wt: YoutubeVideo[], val: number
     for (i = n; i > 0 && res > 0; i--) {
         if (res == K[i - 1][w]) {
             continue;
-        }else {
+        } else {
             res = res - val[i - 1];
             w = w - wt[i - 1].stats.duration;
 
-            results.push({ // if (w < 0) break; //i put the condition here..but not sure if its the right way   
+            results.push({
+                // if (w < 0) break; //i put the condition here..but not sure if its the right way
                 video: wt[i - 1],
                 duration: wt[i - 1].stats.duration,
                 value: val[i - 1],
