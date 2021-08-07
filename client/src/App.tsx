@@ -1,10 +1,10 @@
 import "./style/App.scss";
-import { Navbar } from "./Navbar";
-import { InputPanel } from "./InputPanel";
-import { GeneratedPlaylistPanel } from "./GeneratedPlaylistPanel";
-import { UserPlaylists } from "./UserPlaylists";
+import { Navbar } from "./components/Navbar";
+import { InputPanel } from "./components/InputPanel";
+import { GeneratedPlaylistPanel } from "./components/GeneratedPlaylistPanel";
+import { UserPlaylists } from "./components/UserPlaylists";
 import { ThemeProvider } from "@material-ui/core";
-import { AppContents } from "./components/AppContents";
+import { AppContents } from "./containers/AppContents";
 import { AppTheme } from "./themes/themes";
 
 require("dotenv").config();

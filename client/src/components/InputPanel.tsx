@@ -1,4 +1,3 @@
-import React from "react";
 import TextField from "@material-ui/core/TextField";
 import MenuItem from "@material-ui/core/MenuItem";
 import FormHelperText from "@material-ui/core/FormHelperText";
@@ -9,8 +8,8 @@ import Typography from "@material-ui/core/Typography";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 import YouTubeIcon from "@material-ui/icons/YouTube";
-import { usePreference } from "./contexts/PreferenceContext";
-import { useUser } from "./contexts/UserContext";
+import { usePreference } from "../contexts/PreferenceContext";
+import { useUser } from "../contexts/UserContext";
 
 const PRIORITY = {
     RANDOM: "random",

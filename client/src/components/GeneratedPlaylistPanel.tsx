@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { SortabledPlaylist } from "./SortablePlaylist";
 import arrayMove from "array-move";
 import Card from "@material-ui/core/Card";
@@ -10,7 +10,7 @@ import TextField from "@material-ui/core/TextField";
 import Grid from "@material-ui/core/Grid";
 import CancelIcon from "@material-ui/icons/Cancel";
 import IconButton from "@material-ui/core/IconButton";
-import { useUser } from "./contexts/UserContext";
+import { useUser } from "../contexts/UserContext";
 
 const GeneratedPlaylistPanel = () => {
     const { generatedPlaylist, updateGeneratedPlaylist, savePlaylist } = useUser();
@@ -48,7 +48,7 @@ const GeneratedPlaylistPanel = () => {
                     </Grid>
                     <Grid key={0} item>
                         <IconButton edge="end" aria-label="clear" onClick={() => updateGeneratedPlaylist([])}>
-                            <CancelIco color="secondary" />
+                            <CancelIcon color="secondary" />
                         </IconButton>
                     </Grid>
                 </Grid>
