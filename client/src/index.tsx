@@ -4,12 +4,15 @@ import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { PreferenceProvider } from "./contexts/PreferenceContext";
+import { UserProvider } from "./contexts/UserContext";
 
 ReactDOM.render(
     <React.StrictMode>
-        <PreferenceProvider>
-            <App />
-        </PreferenceProvider>
+        <UserProvider>
+            <PreferenceProvider>
+                <App />
+            </PreferenceProvider>
+        </UserProvider>
     </React.StrictMode>,
     document.getElementById("root")
 );

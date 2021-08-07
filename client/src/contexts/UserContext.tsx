@@ -63,6 +63,7 @@ const UserProvider = (props: any) => {
 
     //Initial Data Load
     useEffect(() => {
+        console.log("initial data load")
         const authenticate = async () => {
             const url =
                 process.env.NODE_ENV === "production"
@@ -79,10 +80,12 @@ const UserProvider = (props: any) => {
                 .get(url, config, { withCredentials: true })
                 .then((response: AxiosResponse) => {
                     const data = response.data;
+                    console.log(data)
 
                     if (data.success) {
                         setAuthenticated(true);
                         setUser(response.data.user);
+                        console.log(response.data.user)
 
                         const userPlaylists = response.data.user.playlists;
                         console.log(userPlaylists);
