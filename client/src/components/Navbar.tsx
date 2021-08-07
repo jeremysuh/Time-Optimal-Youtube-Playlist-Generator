@@ -5,7 +5,7 @@ import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
 import { useUser } from "../contexts/UserContext";
- 
+
 const useStyles = makeStyles((theme) => ({
     root: {
         flexGrow: 1,
@@ -20,7 +20,7 @@ const useStyles = makeStyles((theme) => ({
 
 const Navbar = () => {
     const classes = useStyles();
-    const { user, authenticated } = useUser();
+    const { user, isAuthenticated } = useUser();
 
     const onSignInClick = () => {
         window.open(
@@ -50,7 +50,7 @@ const Navbar = () => {
                     <Typography style={{ display: "inline-block", paddingRight: "2em" }}>
                         {user ? user.displayName : ""}
                     </Typography>
-                    {authenticated === false ? (
+                    {isAuthenticated === false ? (
                         <Button color="inherit" onClick={() => onSignInClick()}>
                             Login
                         </Button>

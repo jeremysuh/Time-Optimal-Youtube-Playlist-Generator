@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
+import { useUserAuth } from "../hooks/useUserAuth";
 import { AxiosError, AxiosResponse } from "axios";
 import { createContext } from "react";
 
@@ -8,7 +9,7 @@ const { v4: uuidv4 } = require("uuid");
 type UserContextState = {
     playlists: Playlist[];
     generatedPlaylist: any[];
-    authenticated: boolean;
+    isAuthenticated: boolean;
     loading: boolean;
     initialLoad: boolean;
     user: any;
@@ -22,7 +23,7 @@ type UserContextState = {
 const UserContextDefaultValues: UserContextState = {
     playlists: [],
     generatedPlaylist: [],
-    authenticated: false,
+    isAuthenticated: false,
     loading: false,
     initialLoad: false,
     user: null,
@@ -52,69 +53,15 @@ export const useUser = () => {
 };
 
 const UserProvider = (props: any) => {
-    const [user, setUser] = useState<any>(null);
-    const [initialLoad, setInitialLoad] = useState<boolean>(false);
-    const [authenticated, setAuthenticated] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
+    const [user, data, isAuthenticated, isCompleted] = useUserAuth();
 
     const [playlists, setPlaylists] = useState<Playlist[]>([]);
     const [generatedPlaylist, setGeneratedPlaylist] = useState<any[]>([]);
 
-    //Initial Data Load
     useEffect(() => {
-        console.log("initial data load");
-        const authenticate = async () => {
-            const url =
-                process.env.NODE_ENV === "production"
-                    ? "https://youtube-playlist-generator.herokuapp.com/api/auth/login/check"
-                    : "http://localhost:3001/api/auth/login/check";
-            let config = {
-                headers: {
-                    "Content-Type": "application/json",
-                    "Access-Control-Allow-Credentials": true,
-                },
-                withCredentials: true,
-            };
-            await axios
-                .get(url, config, { withCredentials: true })
-                .then((response: AxiosResponse) => {
-                    const data = response.data;
-                    console.log(data);
-
-                    if (data.success) {
-                        setAuthenticated(true);
-                        setUser(response.data.user);
-                        console.log(response.data.user);
-
-                        const userPlaylists = response.data.user.playlists;
-                        console.log(userPlaylists);
-                        const temp: Playlist[] = userPlaylists.map((playlist: any) => {
-                            return {
-                                id: playlist.playlist_id,
-                                name: playlist.name,
-                                videos: playlist.videos,
-                                createdOn: playlist.date_added,
-                                updatedOn: playlist.last_updated,
-                            };
-                        });
-                        console.log(temp);
-                        setPlaylists(temp);
-                    } else {
-                        setAuthenticated(false);
-                        setUser(null);
-                        const local_playlists = localStorage.getItem("local_playlists");
-                        if (local_playlists) setPlaylists(JSON.parse(local_playlists));
-                    }
-                    setInitialLoad(true);
-                })
-                .catch((error: AxiosError) => {
-                    setAuthenticated(false);
-                    setInitialLoad(true);
-                    console.log(error.message);
-                });
-        };
-        authenticate();
-    }, []);
+        setPlaylists(data); //data from user auth -> playlist
+    }, [data]);
 
     const deletePlaylist = (id: string) => {
         let updatedPlaylists: Playlist[] = playlists.slice();
@@ -122,7 +69,7 @@ const UserProvider = (props: any) => {
 
         setPlaylists(updatedPlaylists);
 
-        if (!authenticated) {
+        if (!isAuthenticated) {
             localStorage.setItem("local_playlists", JSON.stringify(updatedPlaylists));
             return;
         }
@@ -142,7 +89,7 @@ const UserProvider = (props: any) => {
             withCredentials: true,
         };
 
-        if (authenticated)
+        if (isAuthenticated)
             axios
                 .post(url, config, { withCredentials: true })
                 .then(() => console.log("added"))
@@ -161,7 +108,7 @@ const UserProvider = (props: any) => {
             setPlaylists(updatedPlaylists);
         }
 
-        if (!authenticated) {
+        if (!isAuthenticated) {
             localStorage.setItem("local_playlists", JSON.stringify(updatedPlaylists));
             return;
         }
@@ -183,7 +130,7 @@ const UserProvider = (props: any) => {
             withCredentials: true,
         };
 
-        if (authenticated)
+        if (isAuthenticated)
             axios
                 .post(url, config, { withCredentials: true })
                 .then(() => console.log("added"))
@@ -213,7 +160,7 @@ const UserProvider = (props: any) => {
 
         setPlaylists(updatedPlaylists);
 
-        if (!authenticated) {
+        if (!isAuthenticated) {
             localStorage.setItem("local_playlists", JSON.stringify(updatedPlaylists));
             return;
         }
@@ -238,7 +185,7 @@ const UserProvider = (props: any) => {
             withCredentials: true,
         };
 
-        if (authenticated)
+        if (isAuthenticated)
             axios
                 .post(url, config, { withCredentials: true })
                 .then(() => console.log("added"))
@@ -304,12 +251,14 @@ const UserProvider = (props: any) => {
         setGeneratedPlaylist(newPlaylist);
     };
 
+    const initialLoad = isCompleted;
+
     return (
         <UserContext.Provider
             value={{
                 playlists,
                 generatedPlaylist,
-                authenticated,
+                isAuthenticated,
                 loading,
                 user,
                 initialLoad,
