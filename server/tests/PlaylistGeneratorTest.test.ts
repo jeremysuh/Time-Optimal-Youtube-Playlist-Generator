@@ -29,7 +29,7 @@ test("setting accessToken", () => {
 });
 
 test("retrieve video ids from playlist", async () => {
-    const playlistItem : PlaylistItem = {
+    const playlistItem: PlaylistItem = {
         kind: "youtube#playlistItem",
         etag: "estag",
         id: "playlistItemId",
@@ -79,19 +79,18 @@ test("retrieve video ids from playlist", async () => {
             totalResults: 1,
             resultsPerPage: 1,
         },
-        items: items
+        items: items,
     };
 
     axios.get.mockResolvedValue({
         data: resolvedResponse,
     });
 
-    let expected : string[] = [];
-    expected.push("PLZ1dJqY6KWOVh8fMrUVswwmdJNU")
+    let expected: string[] = [];
+    expected.push("PLZ1dJqY6KWOVh8fMrUVswwmdJNU");
 
     const received = await playlistGenerator.retrieveVideoIdsFromPlaylist();
 
-    expect(received.length).toBe(1)
-    expect(received[0]).toBe(expected[0])
-
+    expect(received.length).toBe(1);
+    expect(received[0]).toBe(expected[0]);
 });
