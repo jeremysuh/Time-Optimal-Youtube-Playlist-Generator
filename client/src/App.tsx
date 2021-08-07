@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./App.scss";
+import "./style/App.scss";
 import { AxiosError, AxiosResponse } from "axios";
 import { useEffect } from "react";
 import { Navbar } from "./Navbar";
@@ -8,24 +8,11 @@ import { GeneratedPlaylistPanel } from "./GeneratedPlaylistPanel";
 import { UserPlaylists } from "./UserPlaylists";
 import { createTheme } from "@material-ui/core/styles";
 import { ThemeProvider } from "@material-ui/core";
+import { usePreference } from "./contexts/PreferenceContext";
 
 const axios = require("axios").default;
 require("dotenv").config();
 const { v4: uuidv4 } = require("uuid");
-
-const PRIORITY = {
-    RANDOM: "random",
-    VIEWS_MANY: "views_many",
-    VIEWS_FEW: "views_few",
-    COMMENTS_MANY: "comments_many",
-    COMMENTS_FEW: "comments_few",
-    LIKES: "likes", //will focus on ratio (instead of absolute value)
-    DISLIKES: "dislikes", //will focus on ratio (instead of absolute value)
-    NEW: "new",
-    OLD: "old",
-    DURATION_LONG: "duration_long",
-    DURATION_SHORT: "duration_short",
-};
 
 type Video = {
     id: string;
@@ -56,11 +43,7 @@ function App() {
     const [authenticated, setAuthenticated] = useState<boolean>(false);
     const [user, setUser] = useState<any>(null);
 
-    const [playlistUrl, setPlaylistUrl] = useState<string>(
-        "https://www.youtube.com/watch?v=gNi_6U5Pm_o&list=PLDIoUOhQQPlXr63I_vwF9GD8sAKh77dWU"
-    );
-    const [time, setTime] = useState<number>(30);
-    const [priortiy, setPriority] = useState<string>(PRIORITY.RANDOM);
+    const { preference } = usePreference();
 
     const [generatedPlaylist, setGeneratedPlaylist] = useState<any[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
@@ -146,7 +129,7 @@ function App() {
         const params = new URLSearchParams();
         params.append("playlistId", playlistId as string);
         params.append("time", (time * 60).toString());
-        params.append("priority", priortiy);
+        params.append("priority", preference.priority);
 
         const url =
             process.env.NODE_ENV === "production"
@@ -173,10 +156,6 @@ function App() {
                 console.log(error);
                 setLoading(false);
             });
-    };
-
-    const onPriorityChange = (value: string) => {
-        setPriority(value);
     };
 
     const savePlaylist = (playlistName: string) => {
@@ -327,40 +306,29 @@ function App() {
     };
 
     return (
-        <div>
-            <ThemeProvider theme={theme}>
-                <Navbar
-                    authenticated={authenticated}
-                    onSignInClick={onSignInClick}
-                    onSignOutClick={onSignOutClick}
-                    displayName={user ? user.displayName : ""}
+        <ThemeProvider theme={theme}>
+            <Navbar
+                authenticated={authenticated}
+                onSignInClick={onSignInClick}
+                onSignOutClick={onSignOutClick}
+                displayName={user ? user.displayName : ""}
+            />
+            <br />
+            <div className="App">
+                <InputPanel generatePlaylist={generatePlaylist} loading={loading} />
+                <GeneratedPlaylistPanel
+                    generatedPlaylist={generatedPlaylist}
+                    setGeneratedPlaylist={setGeneratedPlaylist}
+                    savePlaylist={savePlaylist}
                 />
-                <br />
-                <div className="App">
-                    <InputPanel
-                        playlistUrl={playlistUrl}
-                        setPlaylistUrl={setPlaylistUrl}
-                        time={time}
-                        setTime={setTime}
-                        onPriorityChange={onPriorityChange}
-                        generatePlaylist={generatePlaylist}
-                        loading={loading}
-                        authenticated={authenticated}
-                    />
-                    <GeneratedPlaylistPanel
-                        generatedPlaylist={generatedPlaylist}
-                        setGeneratedPlaylist={setGeneratedPlaylist}
-                        savePlaylist={savePlaylist}
-                    />
-                    <UserPlaylists
-                        initialLoad={initialLoad}
-                        playlists={playlists}
-                        deletePlaylist={deletePlaylist}
-                        editPlaylist={editPlaylist}
-                    />
-                </div>
-            </ThemeProvider>
-        </div>
+                <UserPlaylists
+                    initialLoad={initialLoad}
+                    playlists={playlists}
+                    deletePlaylist={deletePlaylist}
+                    editPlaylist={editPlaylist}
+                />
+            </div>
+        </ThemeProvider>
     );
 }
 

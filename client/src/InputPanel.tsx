@@ -9,6 +9,8 @@ import Typography from "@material-ui/core/Typography";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 import YouTubeIcon from "@material-ui/icons/YouTube";
+import { usePreference } from "./contexts/PreferenceContext";
+
 const PRIORITY = {
     RANDOM: "random",
     VIEWS_MANY: "views_many",
@@ -24,31 +26,23 @@ const PRIORITY = {
 };
 
 interface InputPanelProps {
-    playlistUrl: string;
-    setPlaylistUrl: Function;
-    time: number;
-    setTime: Function;
-    onPriorityChange: Function;
     generatePlaylist: Function;
     loading: boolean;
-    authenticated: boolean;
 }
 
 const InputPanel = ({
-    playlistUrl,
-    setPlaylistUrl,
-    time,
-    setTime,
-    onPriorityChange,
     generatePlaylist,
     loading,
-    authenticated,
 }: InputPanelProps) => {
+
+    const {preference, setPriority, setTime, setUrl} = usePreference();
+
     const isValidYoutubePlaylistUrl =
-        (playlistUrl.includes("www.youtube.com") ||
-            playlistUrl.includes("https://youtube.com") ||
-            playlistUrl.includes("youtube.com")) &&
-        playlistUrl.includes("list=");
+        (preference.url.includes("www.youtube.com") ||
+        preference.url.includes("https://youtube.com") ||
+        preference.url.includes("youtube.com")) &&
+        preference.url.includes("list=");
+
 
     return (
         <Card
@@ -80,10 +74,10 @@ const InputPanel = ({
                         label={!isValidYoutubePlaylistUrl ? "Invalid Playlist URL" : "Enter Playlist URL"}
                         error={!isValidYoutubePlaylistUrl}
                         variant="outlined"
-                        value={playlistUrl}
+                        value={preference.url}
                         style={{ minWidth: "50vw" }}
                         onChange={(event) => {
-                            setPlaylistUrl(event.target.value);
+                            setUrl(event.target.value);
                         }}
                     />
                 </div>
@@ -97,7 +91,7 @@ const InputPanel = ({
                             shrink: true,
                         }}
                         variant="outlined"
-                        value={time}
+                        value={preference.time}
                         onChange={(event) => {
                             setTime(Math.round(Number(event.target.value))); //change minutes to seconds
                         }}
@@ -108,12 +102,12 @@ const InputPanel = ({
                         <Select
                             labelId="priority-select-helper-label"
                             id="priority-select-helper"
-                            onChange={(e) => onPriorityChange(e.target.value)}
+                            onChange={(e) => setPriority(e.target.value as string)}
                             defaultValue={PRIORITY.RANDOM}
                             style={{ minWidth: "20vw" }}
                         >
-                            {Object.entries(PRIORITY).map((entry) => (
-                                <MenuItem value={entry[1]} key={entry[0]}>
+                            {Object.entries(PRIORITY).map((entry, index) => (
+                                <MenuItem value={entry[1]} key={index}>
                                     {entry[0]}
                                 </MenuItem>
                             ))}
@@ -124,7 +118,7 @@ const InputPanel = ({
                 <Button
                     variant="contained"
                     color="secondary"
-                    onClick={() => generatePlaylist(playlistUrl, time)}
+                    onClick={() => generatePlaylist(preference.url, preference.time)}
                     disabled={loading}
                     style={{ margin: "8px" }}
                 >
