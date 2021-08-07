@@ -5,20 +5,19 @@ import AccordionSummary from "@material-ui/core/AccordionSummary";
 import AccordionDetails from "@material-ui/core/AccordionDetails";
 import Typography from "@material-ui/core/Typography";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import { useUser } from "./contexts/UserContext";
 
-interface UserPlaylistsProps {
-    initialLoad: boolean;
-    playlists: any[];
-    deletePlaylist: Function;
-    editPlaylist: Function;
-}
 
-const UserPlaylists = ({ initialLoad, playlists, deletePlaylist, editPlaylist }: UserPlaylistsProps) => {
+
+const UserPlaylists = () => {
+
+    const {playlists, initialLoad,  editPlaylist, deletePlaylist, } = useUser();
+
     const sortedPlaylist = playlists.sort((playlistA, playlistB) => {
         //newest to oldest
         return new Date(playlistB.createdOn).getTime() - new Date(playlistA.createdOn).getTime();
     });
-
+    
     return initialLoad ? (
         <div style={{ margin: "1em", minWidth: "50vw" }}>
             <Typography variant="h5">Saved Playlists:</Typography>

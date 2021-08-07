@@ -10,6 +10,7 @@ import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 import YouTubeIcon from "@material-ui/icons/YouTube";
 import { usePreference } from "./contexts/PreferenceContext";
+import { useUser } from "./contexts/UserContext";
 
 const PRIORITY = {
     RANDOM: "random",
@@ -23,26 +24,18 @@ const PRIORITY = {
     OLD: "old",
     DURATION_LONG: "duration_long",
     DURATION_SHORT: "duration_short",
-};
+}; 
 
-interface InputPanelProps {
-    generatePlaylist: Function;
-    loading: boolean;
-}
-
-const InputPanel = ({
-    generatePlaylist,
-    loading,
-}: InputPanelProps) => {
-
+const InputPanel = () => {
+    
     const {preference, setPriority, setTime, setUrl} = usePreference();
+    const {generatePlaylist, loading} = useUser();
 
     const isValidYoutubePlaylistUrl =
         (preference.url.includes("www.youtube.com") ||
         preference.url.includes("https://youtube.com") ||
         preference.url.includes("youtube.com")) &&
         preference.url.includes("list=");
-
 
     return (
         <Card
@@ -118,7 +111,7 @@ const InputPanel = ({
                 <Button
                     variant="contained"
                     color="secondary"
-                    onClick={() => generatePlaylist(preference.url, preference.time)}
+                    onClick={() => generatePlaylist(preference.url, preference.time, preference.priority)}
                     disabled={loading}
                     style={{ margin: "8px" }}
                 >

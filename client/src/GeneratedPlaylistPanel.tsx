@@ -10,17 +10,12 @@ import TextField from "@material-ui/core/TextField";
 import Grid from "@material-ui/core/Grid";
 import CancelIcon from "@material-ui/icons/Cancel";
 import IconButton from "@material-ui/core/IconButton";
-interface GeneratedPlaylistPanelProps {
-    generatedPlaylist: any[];
-    setGeneratedPlaylist: Function;
-    savePlaylist: Function;
-}
+import { useUser } from "./contexts/UserContext";
 
-const GeneratedPlaylistPanel = ({
-    generatedPlaylist,
-    setGeneratedPlaylist,
-    savePlaylist,
-}: GeneratedPlaylistPanelProps) => {
+const GeneratedPlaylistPanel = () => {
+
+    const {generatedPlaylist, updateGeneratedPlaylist, savePlaylist} = useUser();
+
     let generatedPlaylistTotalDuration = 0;
     generatedPlaylist.forEach((video) => (generatedPlaylistTotalDuration += video.stats.duration / 60));
 
@@ -36,13 +31,13 @@ const GeneratedPlaylistPanel = ({
 
     const onSortPlaylistEnd = ({ oldIndex, newIndex }: any) => {
         const newPlaylist = arrayMove(generatedPlaylist, oldIndex as number, newIndex as number);
-        setGeneratedPlaylist(newPlaylist);
+        updateGeneratedPlaylist(newPlaylist);
     };
 
     const deleteVideoInGeneratedPlaylist = (indexInPlaylist: number) => {
         let updatedPlaylist = generatedPlaylist.slice();
         updatedPlaylist = updatedPlaylist.filter((_, index) => index !== indexInPlaylist);
-        setGeneratedPlaylist(updatedPlaylist);
+        updateGeneratedPlaylist(updatedPlaylist);
     };
 
     return generatedPlaylist.length > 0 ? (
@@ -53,7 +48,7 @@ const GeneratedPlaylistPanel = ({
                 <Typography variant="h5">Generated Playlist</Typography>
                 </Grid>
                 <Grid key={0} item>
-                <IconButton edge="end" aria-label="clear" onClick={() => setGeneratedPlaylist([])}>
+                <IconButton edge="end" aria-label="clear" onClick={() => updateGeneratedPlaylist([])}>
                     <CancelIcon color="secondary"/>
                 </IconButton>
                 </Grid>

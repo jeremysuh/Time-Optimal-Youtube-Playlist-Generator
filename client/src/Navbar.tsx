@@ -4,13 +4,7 @@ import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
-
-interface NavbarProps {
-    authenticated: boolean;
-    onSignInClick: Function;
-    onSignOutClick: Function;
-    displayName: string;
-}
+import { useUser } from "./contexts/UserContext";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -24,8 +18,27 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const Navbar = ({ authenticated, onSignInClick, onSignOutClick, displayName }: NavbarProps) => {
+const Navbar = () => {
     const classes = useStyles();
+    const {user, authenticated} = useUser();
+
+    const onSignInClick = () => {
+        window.open(
+            process.env.NODE_ENV === "production"
+                ? "https://youtube-playlist-generator.herokuapp.com/api/auth/google"
+                : "http://localhost:3001/api/auth/google",
+            "_self"
+        );
+    };
+
+    const onSignOutClick = () => {
+        window.open(
+            process.env.NODE_ENV === "production"
+                ? "https://youtube-playlist-generator.herokuapp.com/api/logout"
+                : "http://localhost:3001/api/logout",
+            "_self"
+        );
+    };
 
     return (
         <div className={classes.root}>
@@ -34,7 +47,7 @@ const Navbar = ({ authenticated, onSignInClick, onSignOutClick, displayName }: N
                     <Typography variant="h6" className={classes.title}>
                         Youtube Playlist Generator
                     </Typography>
-                    <Typography style={{ display: "inline-block", paddingRight: "2em" }}>{displayName}</Typography>
+                    <Typography style={{ display: "inline-block", paddingRight: "2em" }}>{user ? user.displayName : ""}</Typography>
                     {authenticated === false ? (
                         <Button color="inherit" onClick={() => onSignInClick()}>
                             Login
