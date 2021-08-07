@@ -24,17 +24,16 @@ const PRIORITY = {
     OLD: "old",
     DURATION_LONG: "duration_long",
     DURATION_SHORT: "duration_short",
-}; 
+};
 
 const InputPanel = () => {
-    
-    const {preference, setPriority, setTime, setUrl} = usePreference();
-    const {generatePlaylist, loading} = useUser();
+    const { preference, setPriority, setTime, setUrl } = usePreference();
+    const { generatePlaylist, loading } = useUser();
 
     const isValidYoutubePlaylistUrl =
         (preference.url.includes("www.youtube.com") ||
-        preference.url.includes("https://youtube.com") ||
-        preference.url.includes("youtube.com")) &&
+            preference.url.includes("https://youtube.com") ||
+            preference.url.includes("youtube.com")) &&
         preference.url.includes("list=");
 
     return (

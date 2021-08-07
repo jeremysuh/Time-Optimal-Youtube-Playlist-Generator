@@ -1,4 +1,3 @@
-import React from "react";
 import { PlaylistPanel } from "./PlaylistPanel";
 import Accordion from "@material-ui/core/Accordion";
 import AccordionSummary from "@material-ui/core/AccordionSummary";
@@ -7,17 +6,14 @@ import Typography from "@material-ui/core/Typography";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import { useUser } from "./contexts/UserContext";
 
-
-
 const UserPlaylists = () => {
-
-    const {playlists, initialLoad,  editPlaylist, deletePlaylist, } = useUser();
+    const { playlists, initialLoad, editPlaylist, deletePlaylist } = useUser();
 
     const sortedPlaylist = playlists.sort((playlistA, playlistB) => {
         //newest to oldest
         return new Date(playlistB.createdOn).getTime() - new Date(playlistA.createdOn).getTime();
     });
-    
+
     return initialLoad ? (
         <div style={{ margin: "1em", minWidth: "50vw" }}>
             <Typography variant="h5">Saved Playlists:</Typography>

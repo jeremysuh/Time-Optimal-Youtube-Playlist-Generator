@@ -20,7 +20,7 @@ const useStyles = makeStyles((theme) => ({
 
 const Navbar = () => {
     const classes = useStyles();
-    const {user, authenticated} = useUser();
+    const { user, authenticated } = useUser();
 
     const onSignInClick = () => {
         window.open(
@@ -47,7 +47,9 @@ const Navbar = () => {
                     <Typography variant="h6" className={classes.title}>
                         Youtube Playlist Generator
                     </Typography>
-                    <Typography style={{ display: "inline-block", paddingRight: "2em" }}>{user ? user.displayName : ""}</Typography>
+                    <Typography style={{ display: "inline-block", paddingRight: "2em" }}>
+                        {user ? user.displayName : ""}
+                    </Typography>
                     {authenticated === false ? (
                         <Button color="inherit" onClick={() => onSignInClick()}>
                             Login

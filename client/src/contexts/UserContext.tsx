@@ -8,10 +8,10 @@ const { v4: uuidv4 } = require("uuid");
 type UserContextState = {
     playlists: Playlist[];
     generatedPlaylist: any[];
-    authenticated : boolean;
-    loading : boolean;
-    initialLoad : boolean;
-    user : any;
+    authenticated: boolean;
+    loading: boolean;
+    initialLoad: boolean;
+    user: any;
     editPlaylist: (id: string, newName: string, videos: Video[]) => void;
     deletePlaylist: (id: string) => void;
     savePlaylist: (id: string) => void;
@@ -22,10 +22,10 @@ type UserContextState = {
 const UserContextDefaultValues: UserContextState = {
     playlists: [],
     generatedPlaylist: [],
-    authenticated : false,
-    loading : false,
-    initialLoad : false,
-    user : null,
+    authenticated: false,
+    loading: false,
+    initialLoad: false,
+    user: null,
     editPlaylist: () => {},
     deletePlaylist: () => {},
     savePlaylist: () => {},
@@ -45,7 +45,6 @@ type Playlist = {
     createdOn: string;
     updatedOn: string;
 };
- 
 
 const UserContext = createContext<UserContextState>(UserContextDefaultValues);
 export const useUser = () => {
@@ -63,7 +62,7 @@ const UserProvider = (props: any) => {
 
     //Initial Data Load
     useEffect(() => {
-        console.log("initial data load")
+        console.log("initial data load");
         const authenticate = async () => {
             const url =
                 process.env.NODE_ENV === "production"
@@ -80,12 +79,12 @@ const UserProvider = (props: any) => {
                 .get(url, config, { withCredentials: true })
                 .then((response: AxiosResponse) => {
                     const data = response.data;
-                    console.log(data)
+                    console.log(data);
 
                     if (data.success) {
                         setAuthenticated(true);
                         setUser(response.data.user);
-                        console.log(response.data.user)
+                        console.log(response.data.user);
 
                         const userPlaylists = response.data.user.playlists;
                         console.log(userPlaylists);

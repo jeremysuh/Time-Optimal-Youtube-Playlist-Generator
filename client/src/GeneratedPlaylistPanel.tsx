@@ -13,8 +13,7 @@ import IconButton from "@material-ui/core/IconButton";
 import { useUser } from "./contexts/UserContext";
 
 const GeneratedPlaylistPanel = () => {
-
-    const {generatedPlaylist, updateGeneratedPlaylist, savePlaylist} = useUser();
+    const { generatedPlaylist, updateGeneratedPlaylist, savePlaylist } = useUser();
 
     let generatedPlaylistTotalDuration = 0;
     generatedPlaylist.forEach((video) => (generatedPlaylistTotalDuration += video.stats.duration / 60));
@@ -43,15 +42,15 @@ const GeneratedPlaylistPanel = () => {
     return generatedPlaylist.length > 0 ? (
         <Card elevation={3} style={{ minWidth: "60vw", margin: "1em" }}>
             <CardContent>
-            <Grid container justifyContent="space-between" spacing={1} alignItems="center">
-            <Grid key={0} item>
-                <Typography variant="h5">Generated Playlist</Typography>
-                </Grid>
-                <Grid key={0} item>
-                <IconButton edge="end" aria-label="clear" onClick={() => updateGeneratedPlaylist([])}>
-                    <CancelIcon color="secondary"/>
-                </IconButton>
-                </Grid>
+                <Grid container justifyContent="space-between" spacing={1} alignItems="center">
+                    <Grid key={0} item>
+                        <Typography variant="h5">Generated Playlist</Typography>
+                    </Grid>
+                    <Grid key={0} item>
+                        <IconButton edge="end" aria-label="clear" onClick={() => updateGeneratedPlaylist([])}>
+                            <CancelIco color="secondary" />
+                        </IconButton>
+                    </Grid>
                 </Grid>
                 <SortabledPlaylist
                     playlist={generatedPlaylist}

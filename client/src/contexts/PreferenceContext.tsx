@@ -51,7 +51,7 @@ const PreferenceProvider = (props: any) => {
     const [preference, setPreference] = useState<Preference>(PreferenceContextDefaultValues.preference);
 
     const setTime = (time: number) => {
-        console.log(time)
+        console.log(time);
         setPreference((prevPreference) => ({
             ...prevPreference,
             time: time,
