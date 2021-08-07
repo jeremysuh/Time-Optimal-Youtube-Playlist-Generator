@@ -1,4 +1,4 @@
 {
     "ext": "ts,json",
-    "exec": "npx ts-node server.ts"
+    "exec": "npx jest && npx ts-node server.ts"
   }

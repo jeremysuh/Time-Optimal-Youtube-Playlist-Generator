@@ -71,6 +71,7 @@ class PlaylistGenerator {
     };
 
     retrieveVideoIdsFromPlaylist = async (): Promise<string[]> => {
+
         const url = "https://youtube.googleapis.com/youtube/v3/playlistItems";
 
         const params = new URLSearchParams();
@@ -314,4 +315,4 @@ class PlaylistGenerator {
     };
 }
 
-export { PlaylistGenerator };
+export { PlaylistGenerator, PRIORITY };
