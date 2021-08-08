@@ -1,9 +1,9 @@
 # Time Optimal Youtube Playlist Generator
 
-Generates a custom playlist based on a user's available time and existing Youtube playlist url. Created using [React](https://reactjs.org/), [Express](https://expressjs.com/), [YouTube Data API](https://developers.google.com/youtube/v3), and [PostgreSQL](https://www.postgresql.org/).
+Generates a custom playlist based on a user's available time and existing Youtube playlist url. Built using [React](https://reactjs.org/), [Express](https://expressjs.com/), [YouTube Data API](https://developers.google.com/youtube/v3), and [PostgreSQL](https://www.postgresql.org/).
 
 
-Users can select a selection preference (ie. View count, like ratio, upload date) to tweak the outcome of the generated playlists.
+Users can select a selection preference (ie. vgitiew count, like ratio, upload date) to tweak the outcome of the generated playlists.
 
 Live Demo URL: https://time-optimal-youtube-playlist-generator.netlify.app/
 
