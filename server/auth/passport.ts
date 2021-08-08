@@ -28,7 +28,7 @@ passport.use(
             clientSecret: process.env.CLIENT_SECRET,
             callbackURL:
                 process.env.NODE_ENV === "production"
-                    ? "https://youtube-playlist-generator.herokuapp.com/api/auth/google/callback"
+                    ? `${process.env.PRODUCTION_SERVER_URL}/api/auth/google/callback`
                     : "http://localhost:3001/api/auth/google/callback",
         },
         async function (accessToken: any, refreshToken: any, user: any, cb: any) {

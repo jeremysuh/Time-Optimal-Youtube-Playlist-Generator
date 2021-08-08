@@ -21,7 +21,7 @@ const session = cookieSession({
 });
 
 const corsPolicy = cors({
-    origin: ["https://time-optimal-youtube-playlist-generator.netlify.app", "http://localhost:3000"],
+    origin: [`${process.env.PRODUCTION_CLIENT_URL}`, "http://localhost:3000"],
     methods: ["GET", "POST", "OPTIONS", "PUT", "DELETE"],
     credentials: true,
 });

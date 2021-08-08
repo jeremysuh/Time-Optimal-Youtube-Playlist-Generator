@@ -5,6 +5,7 @@ import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
 import { useUser } from "../contexts/UserContext";
+require("dotenv").config();
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -25,7 +26,7 @@ const Navbar = () => {
     const onSignInClick = () => {
         window.open(
             process.env.NODE_ENV === "production"
-                ? "https://youtube-playlist-generator.herokuapp.com/api/auth/google"
+                ? `${process.env.PRODUCTION_SERVER_URL}/api/auth/google`
                 : "http://localhost:3001/api/auth/google",
             "_self"
         );
@@ -34,7 +35,7 @@ const Navbar = () => {
     const onSignOutClick = () => {
         window.open(
             process.env.NODE_ENV === "production"
-                ? "https://youtube-playlist-generator.herokuapp.com/api/logout"
+                ? `${process.env.PRODUCTION_SERVER_URL}/api/logout`
                 : "http://localhost:3001/api/logout",
             "_self"
         );

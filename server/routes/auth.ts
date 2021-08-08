@@ -1,8 +1,9 @@
 import pool from "../db/db";
+require("dotenv").config();
 
 const CLIENT_HOME_PAGE_URL =
     process.env.NODE_ENV === "production"
-        ? "https://time-optimal-youtube-playlist-generator.netlify.app"
+        ? `${process.env.PRODUCTION_CLIENT_URL}`
         : "http://localhost:3000";
 
 exports.loginCheck = async (req: any, res: any) => {
