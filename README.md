@@ -1,18 +1,7 @@
-# Introduction
-- Brief description
+# Time Optimal Youtube Playlist Generator
 - Website snapshot
-
-## Index
-
-- [Introduction](#introduction)
-  - [Index](#index)
-  - [About](#about)
-  - [Usage](#usage)
-    - [Installation](#installation)
-    - [Commands](#commands)
-
-## About
-Detailed about section
+- Brief description
+- Followed by more pictures
 
 ## Usage
 How to use this project
@@ -23,6 +12,3 @@ How to use this project
 ```
 $ installation steps command
 ```
-
-### Commands
-- Commands to start the project
