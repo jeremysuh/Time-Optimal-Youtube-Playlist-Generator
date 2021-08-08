@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { AxiosError, AxiosResponse } from "axios";
 const axios = require("axios").default;
+require("dotenv").config();
 
 type Video = {
     id: string;
@@ -27,7 +28,7 @@ const useUserAuth = () => {
         const authenticate = async () => {
             const url =
                 process.env.NODE_ENV === "production"
-                    ? "https://youtube-playlist-generator.herokuapp.com/api/auth/login/check"
+                    ? `${process.env.REACT_APP_PRODUCTION_SERVER_URL}/api/auth/login/check`
                     : "http://localhost:3001/api/auth/login/check";
             let config = {
                 headers: {

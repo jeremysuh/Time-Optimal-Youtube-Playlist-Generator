@@ -76,7 +76,7 @@ const UserProvider = (props: any) => {
 
         const url =
             process.env.NODE_ENV === "production"
-                ? `${process.env.PRODUCTION_SERVER_URL}/api/deletePlaylist`
+                ? `${process.env.REACT_APP_PRODUCTION_SERVER_URL}/api/deletePlaylist`
                 : "http://localhost:3001/api/deletePlaylist";
         let config = {
             data: {
@@ -115,7 +115,7 @@ const UserProvider = (props: any) => {
 
         const url =
             process.env.NODE_ENV === "production"
-                ? `${process.env.PRODUCTION_SERVER_URL}/api/updatePlaylist`
+                ? `${process.env.REACT_APP_PRODUCTION_SERVER_URL}/api/updatePlaylist`
                 : "http://localhost:3001/api/updatePlaylist";
         let config = {
             data: {
@@ -167,7 +167,7 @@ const UserProvider = (props: any) => {
 
         const url =
             process.env.NODE_ENV === "production"
-                ? `${process.env.PRODUCTION_SERVER_URL}/api/savePlaylist`
+                ? `${process.env.REACT_APP_PRODUCTION_SERVER_URL}/api/savePlaylist`
                 : "http://localhost:3001/api/savePlaylist";
         let config = {
             data: {
@@ -222,7 +222,7 @@ const UserProvider = (props: any) => {
 
         const url =
             process.env.NODE_ENV === "production"
-                ? `${process.env.PRODUCTION_SERVER_URL}/api/playlist`
+                ? `${process.env.REACT_APP_PRODUCTION_SERVER_URL}/api/playlist`
                 : "http://localhost:3001/api/playlist";
         let config = {
             headers: {

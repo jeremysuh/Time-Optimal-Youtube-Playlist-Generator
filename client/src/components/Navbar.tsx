@@ -26,7 +26,7 @@ const Navbar = () => {
     const onSignInClick = () => {
         window.open(
             process.env.NODE_ENV === "production"
-                ? `${process.env.PRODUCTION_SERVER_URL}/api/auth/google`
+                ? `${process.env.REACT_APP_PRODUCTION_SERVER_URL}/api/auth/google`
                 : "http://localhost:3001/api/auth/google",
             "_self"
         );
@@ -35,7 +35,7 @@ const Navbar = () => {
     const onSignOutClick = () => {
         window.open(
             process.env.NODE_ENV === "production"
-                ? `${process.env.PRODUCTION_SERVER_URL}/api/logout`
+                ? `${process.env.REACT_APP_PRODUCTION_SERVER_URL}/api/logout`
                 : "http://localhost:3001/api/logout",
             "_self"
         );
